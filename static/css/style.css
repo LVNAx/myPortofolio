@@ -199,6 +199,8 @@ h1, .brand {
     }
 }
 
+/*  */
+
 /* Bagian Experience */
 .experience {
     padding: 4rem 0 5rem; /* 1rem = 16px */
@@ -207,14 +209,14 @@ h1, .brand {
 .section-kicker { /* mirip hero-kicker */
     font-size: 0.85rem;
     letter-spacing: 0.08rem;
-    text-transform: uppercase;
+    /* text-transform: uppercase; */
     color: var(--accent-dark);
     font-weight: 700;
     margin-bottom: 0.75rem;
 }
 
 .section-title {
-    font-size: clamp(2rem, 4vw, 2.75rem); /* fungsi clamp(min, preferensi, max) agar ia media responsive. vw: viewport-width */
+    font-size: clamp(1.5rem, 4vw, 2.75rem); /* fungsi clamp(min, preferensi, max) agar ia media responsive. vw: viewport-width */
     line-height: 1; /* line-height: jarak vertikal antar baris */
     margin-bottom: 2.5rem;
 }
@@ -244,7 +246,7 @@ h1, .brand {
     height: 2px;
     background-color: var(--accent);
     border-radius: 999px;
-    transform: scaleX(0); /* bagian ini masih bingung*/
+    transform: scaleX(0); /* Menghilangkan garis di bawah boxnya */
     transform-origin: center;
     transition: transform 0.25s ease;
 }
@@ -263,11 +265,11 @@ h1, .brand {
     padding: 1.5rem;
 }
 
-.experience-summary::-webkit-details-marker { /* ini apaan coy*/
+.experience-summary::-webkit-details-marker { /* By default ada segitiga di setiap experience, pada kode ini ia menghilangkan segitiga tersebut*/
     display: none;
 }
 
-.experience-summary::hover {
+.experience-summary:hover {
     background-color: rgba(217, 93, 57, 0.04);
 }
 
@@ -322,8 +324,9 @@ h1, .brand {
 
 /* Konten detail yang muncul saat kartu dibuka */
 .experience-details {
-    padding: 0 1.5rem 1.75rem calc(1.25rem + 56px + 1.5rem);
+    padding: 0.5rem 1.5rem 1.75rem calc(1.25rem + 56px + 1.5rem);
     color: var(--text-muted);
+    background-color: transparent;
 }
 
 .experience-details p { /* Ini untuk tag <p>*/
@@ -331,11 +334,15 @@ h1, .brand {
 }
 
 .experience-details ul { /* Ini untuk tag <ul>*/
-    padding-left: 1.1rem;
+    padding-left: 0;
 }
 
 .experience-details li { /* Ini untuk tag <li> */
     margin-bottom: 0.4rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: black;
+    font-weight: 400;
+    
 }
 
 
