@@ -198,3 +198,153 @@ h1, .brand {
         justify-content: flex-start;
     }
 }
+
+/* Bagian Experience */
+.experience {
+    padding: 4rem 0 5rem; /* 1rem = 16px */
+}
+
+.section-kicker { /* mirip hero-kicker */
+    font-size: 0.85rem;
+    letter-spacing: 0.08rem;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.section-title {
+    font-size: clamp(2rem, 4vw, 2.75rem); /* fungsi clamp(min, preferensi, max) agar ia media responsive. vw: viewport-width */
+    line-height: 1; /* line-height: jarak vertikal antar baris */
+    margin-bottom: 2.5rem;
+}
+
+.experience-list {
+    display: flex;
+    flex-direction: column; /* column: vertikal, row: horizontal*/
+    gap: 2rem;
+}
+
+/* Kartu utama, dipasang pada elemen <details> */
+.experience-item {
+    background-color: #fff;
+    border: 1px solid var(--line); /* Ia mengikuti root */
+    border-radius: calc(var(--radius) * 4);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Garis di bagian bawah kartu yang akan muncul saat terbuka */
+.experience-item::after { /* Menggambar 'space' baru. */
+    content: "";
+    position: absolute;
+    left: 1.5rem;
+    right: 1.5rem;
+    bottom: 0;
+    height: 2px;
+    background-color: var(--accent);
+    border-radius: 999px;
+    transform: scaleX(0); /* bagian ini masih bingung*/
+    transform-origin: center;
+    transition: transform 0.25s ease;
+}
+
+.experience-item[open]::after {
+    transform: scaleX(1);
+}
+
+/* Bagian yang selalu terlihat */
+.experience-summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem;
+}
+
+.experience-summary::-webkit-details-marker { /* ini apaan coy*/
+    display: none;
+}
+
+.experience-summary::hover {
+    background-color: rgba(217, 93, 57, 0.04);
+}
+
+.experience-logo  {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    background-color: var(--paper);
+}
+
+.experience-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.experience-role {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.experience-place {
+    font-weight: 600;
+    color: var(--accent-dark);
+    margin-top: 0.15rem;
+}
+
+.experience-period {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+}
+
+/* Ikon panah */
+.experience-chevron {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-dark);
+    transition: transform 0.25s ease;
+}
+
+.experience-item[open] .experience-chevron {
+    transform: rotate(180deg);
+}
+
+/* Konten detail yang muncul saat kartu dibuka */
+.experience-details {
+    padding: 0 1.5rem 1.75rem calc(1.25rem + 56px + 1.5rem);
+    color: var(--text-muted);
+}
+
+.experience-details p { /* Ini untuk tag <p>*/
+    margin-bottom: 0.75rem;
+}
+
+.experience-details ul { /* Ini untuk tag <ul>*/
+    padding-left: 1.1rem;
+}
+
+.experience-details li { /* Ini untuk tag <li> */
+    margin-bottom: 0.4rem;
+}
+
+
+@media (max-width: 600px) {
+    .experience-summary {
+        align-items: flex-start;
+    }
+ 
+    .experience-details {
+        padding-left: 1.5rem;
+    }
+}
