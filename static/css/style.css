@@ -43,6 +43,26 @@ h1, .brand {
     justify-content: space-between;
     align-items: center;
     padding: 1.25rem 1.5rem;
+    gap: 1rem; 
+}
+
+/* Navbar di Mobile sebelumnya perlu di-scroll */
+@media (max-width: 600px) {
+    .site-header .container {
+        flex-wrap: wrap;
+        row-gap: 0.75rem;
+    }
+
+    .site-header nav {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.6rem 1.1rem;
+    }
+
+    .site-header nav a {
+        font-size: 0.85rem;
+    }
 }
 
 .brand {
@@ -196,5 +216,626 @@ h1, .brand {
 
     .social-links {
         justify-content: flex-start;
+    }
+}
+
+/*  */
+
+/* Bagian Experience */
+.experience {
+    padding: 4rem 0 5rem; /* 1rem = 16px */
+}
+
+.section-kicker { /* mirip hero-kicker */
+    font-size: 0.85rem;
+    letter-spacing: 0.08rem;
+    /* text-transform: uppercase; */
+    color: var(--accent-dark);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.section-title {
+    font-size: clamp(1.5rem, 4vw, 2.75rem); /* fungsi clamp(min, preferensi, max) agar ia media responsive. vw: viewport-width */
+    line-height: 1; /* line-height: jarak vertikal antar baris */
+    margin-bottom: 2.5rem;
+}
+
+.experience-list {
+    display: flex;
+    flex-direction: column; /* column: vertikal, row: horizontal*/
+    gap: 2rem;
+}
+
+/* Kartu utama, dipasang pada elemen <details> */
+.experience-item {
+    background-color: #fff;
+    border: 1px solid var(--line); /* Ia mengikuti root */
+    border-radius: calc(var(--radius) * 4);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Garis di bagian bawah kartu yang akan muncul saat terbuka */
+.experience-item::after { /* Menggambar 'space' baru. */
+    content: "";
+    position: absolute;
+    left: 1.5rem;
+    right: 1.5rem;
+    bottom: 0;
+    height: 2px;
+    background-color: var(--accent);
+    border-radius: 999px;
+    transform: scaleX(0); /* Menghilangkan garis di bawah boxnya */
+    transform-origin: center;
+    transition: transform 0.25s ease;
+}
+
+.experience-item[open]::after {
+    transform: scaleX(1);
+}
+
+/* Bagian yang selalu terlihat */
+.experience-summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem;
+}
+
+.experience-summary::-webkit-details-marker { /* By default ada segitiga di setiap experience, pada kode ini ia menghilangkan segitiga tersebut*/
+    display: none;
+}
+
+.experience-summary:hover {
+    background-color: rgba(217, 93, 57, 0.04);
+}
+
+.experience-logo  {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    background-color: var(--paper);
+}
+
+.experience-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.experience-role {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.experience-place {
+    font-weight: 600;
+    color: var(--accent-dark);
+    margin-top: 0.15rem;
+}
+
+.experience-period {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+}
+
+/* Ikon panah */
+.experience-chevron {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-dark);
+    transition: transform 0.25s ease;
+}
+
+.experience-item[open] .experience-chevron {
+    transform: rotate(180deg);
+}
+
+/* Konten detail yang muncul saat kartu dibuka */
+.experience-details {
+    padding: 0.5rem 1.5rem 1.75rem calc(1.25rem + 56px + 1.5rem);
+    color: var(--text-muted);
+    background-color: transparent;
+}
+
+.experience-details p { /* Ini untuk tag <p>*/
+    margin-bottom: 0.75rem;
+}
+
+.experience-details ul { /* Ini untuk tag <ul>*/
+    padding-left: 0;
+}
+
+.experience-details li { /* Ini untuk tag <li> */
+    margin-bottom: 0.4rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: black;
+    font-weight: 400;
+    
+}
+
+
+@media (max-width: 600px) {
+    .experience-summary {
+        align-items: flex-start;
+    }
+ 
+    .experience-details {
+        padding-left: 1.5rem;
+    }
+}
+
+/* Bagian About Me */
+.about p {
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--ink);
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.about p:last-child {
+    margin-bottom: 0;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* Bagian Education */
+.education {
+    padding: 4rem 0 5rem;
+}
+
+.timeline {
+    --timeline-line: var(--ink);   /* ganti var(--accent) kalau mau oranye */
+    position: relative;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.timeline::after {
+    content: "";
+    position: absolute;
+    width: 3px;
+    height: 100%;
+    top: 0;
+    left: 50%;
+    margin-left: -1.5px;
+    background-color: var(--timeline-line);
+    border-radius: 999px;
+    z-index: 0;
+    animation: moveline 5s ease-out both;
+}
+
+.container-timeline {
+    position: relative;
+    width: 50%;
+    padding: 10px 30px;
+    z-index: 2;
+    animation: movedown 3s ease-out both;
+}
+
+.container-timeline small {
+    font-style: italic;
+}
+
+.left-container {
+    left: 0;
+}
+
+.right-container {
+    left: 50%;
+}
+
+/* Ini buat munculin yang timeline didelay seberapa */
+.container-timeline:nth-child(1) { animation-delay: 0.2s; }
+.container-timeline:nth-child(2) { animation-delay: 0.45s; }
+.container-timeline:nth-child(3) { animation-delay: 0.7s; }
+.container-timeline:nth-child(4) { animation-delay: 0.95s; }
+.container-timeline:nth-child(5) { animation-delay: 1.2s; }
+.container-timeline:nth-child(n+6) { animation-delay: 1.45s; }
+
+.timeline-avatar {
+    position: absolute;
+    top: 30px;
+    right: -20px;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background-color: var(--paper);
+    box-shadow: 0 0 0 4px var(--paper);
+}
+
+.right-container .timeline-avatar {
+    left: -20px;
+    right: auto;
+}
+
+.text-box {
+    position: relative;
+    padding: 1.25rem 1.5rem;
+    background-color: #fff;
+    border: 1px solid var(--line);
+    border-radius: calc(var(--radius) * 4);
+    font-size: 0.95rem;
+}
+
+.text-box h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.3;
+}
+
+.text-box small {
+    display: inline-block;
+    margin-bottom: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.text-box p {
+    color: var(--ink);
+}
+
+/* Ini untuk arrow di sebelah kotak timeline education */
+.left-container-arrow,
+.right-container-arrow {
+    position: absolute;
+    top: 28px;
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+}
+
+.left-container-arrow::before,
+.right-container-arrow::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+}
+
+.left-container-arrow {
+    right: -12px;
+    border-left: 12px solid var(--line);
+}
+
+.left-container-arrow::before {
+    left: -13px;
+    border-left: 12px solid #fff;
+}
+
+.right-container-arrow {
+    left: -12px;
+    border-right: 12px solid var(--line);
+}
+
+.right-container-arrow::before {
+    left: 1px;
+    border-right: 12px solid #fff;
+}
+
+@keyframes movedown {
+    0% {
+        opacity: 0;
+        transform: translateY(-24px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes moveline {
+    0%   { height: 0; }
+    100% { height: 100%; }
+}
+
+/* Ini utk tampilan mobile kita samaratakan ia jadi di kiri (yang sebelumnya ada kanan dan kiri) */
+@media (max-width: 600px) {
+    .timeline::after {
+        left: 20px;
+        margin-left: -1.5px;
+    }
+
+    .container-timeline,
+    .left-container,
+    .right-container {
+        width: 100%;
+        left: 0;
+        padding-left: 52px;
+        padding-right: 0;
+    }
+
+    .timeline-avatar,
+    .right-container .timeline-avatar {
+        left: 0;
+        right: auto;
+    }
+
+    .left-container-arrow,
+    .right-container-arrow {
+        left: -12px;
+        right: auto;
+        border-left: 0;
+        border-right: 12px solid var(--line);
+    }
+
+    .left-container-arrow::before,
+    .right-container-arrow::before {
+        left: 1px;
+        border-left: 0;
+        border-right: 12px solid #fff;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .container-timeline {
+        animation: none;
+        opacity: 1;
+    }
+
+    .timeline::after {
+        animation: none;
+        height: 100%;
+    }
+}
+
+/* Bagian Contacts */
+.contact {
+    position: relative;
+    overflow: hidden;
+    padding: 4.5rem 0 5rem;
+    /* Pita hangat supaya bagian penutup halaman terasa beda dari section lain. */
+    background-color: #f3d9b6;
+}
+
+/* Lapisan noise sebagai hiasan, jadi tidak menangkap klik. */
+.contact::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("/static/img/noise.svg");
+}
+
+.contact-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.contact-title {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    text-align: center;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+}
+
+.contact-intro {
+    max-width: 44ch;
+    margin: 0 auto 2.75rem;
+    text-align: center;
+    color: var(--accent-dark);
+    font-weight: 500;
+}
+
+/* Kartu formulir */
+.contact-card-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.contact-card {
+    background-color: #fbf7f2;
+    border: 1px solid rgba(217, 93, 57, 0.18);
+    border-radius: 18px;
+    box-shadow: 0 18px 40px rgba(120, 70, 40, 0.08);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+}
+
+.contact-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.15rem;
+}
+
+.field {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.field label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent);
+    transform-origin: left center;
+    width: fit-content;
+}
+
+.field input,
+.field textarea {
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--ink);
+    background-color: transparent;
+    border: 1px solid rgba(217, 93, 57, 0.35);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.field input:focus,
+.field textarea:focus {
+    border-color: var(--accent);
+    background-color: #fff;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+    color: #a89e93;
+}
+
+.field textarea {
+    resize: vertical;
+    min-height: 180px;
+}
+
+/* Garis aksen di dasar field, dianimasikan oleh anime.js */
+.field-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    border-radius: 999px;
+    background-color: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+    pointer-events: none;
+}
+
+/* Tombol kirim dengan blok pucat yang menyembul di kiri bawah */
+.contact-submit-wrap {
+    position: relative;
+    margin-top: 0.35rem;
+}
+
+.contact-submit-wrap::before {
+    content: "";
+    position: absolute;
+    left: -0.85rem;
+    bottom: -0.85rem;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(217, 93, 57, 0.18);
+    border-radius: 12px;
+    z-index: 0;
+}
+
+.contact-submit {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    background-color: var(--accent);
+    border: none;
+    border-radius: 12px;
+    padding: 0.95rem 1.4rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.contact-submit:hover {
+    background-color: var(--accent-dark);
+}
+
+.contact-submit:disabled {
+    cursor: default;
+    background-color: var(--accent-dark);
+}
+
+.contact-submit-icon {
+    font-size: 1.2rem;
+}
+
+.contact-status {
+    min-height: 1.2rem;
+    margin-top: 0.75rem;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+    opacity: 0;
+}
+
+/* Deretan ikon kanal kontak */
+.contact-icons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 3rem;
+}
+
+.contact-icon {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background-color: var(--accent);
+    color: #fff;
+    font-size: 1.35rem;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.contact-icon:hover,
+.contact-icon:focus-visible {
+    background-color: var(--accent-dark);
+}
+
+@media (max-width: 600px) {
+    .contact-row {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-card {
+        padding: 1.35rem;
+    }
+
+    .contact-submit-wrap::before {
+        left: -0.6rem;
+        bottom: -0.6rem;
+    }
+
+    .contact-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Kalau user mematikan animasi di sistemnya, garis field
+   akan tetap muncul lewat CSS biasa dan tidak ada gerakan lain. */
+@media (prefers-reduced-motion: reduce) {
+    .field input:focus ~ .field-line,
+    .field textarea:focus ~ .field-line {
+        transform: scaleX(1);
     }
 }
