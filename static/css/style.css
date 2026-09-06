@@ -43,6 +43,26 @@ h1, .brand {
     justify-content: space-between;
     align-items: center;
     padding: 1.25rem 1.5rem;
+    gap: 1rem; 
+}
+
+/* Navbar di Mobile sebelumnya perlu di-scroll */
+@media (max-width: 600px) {
+    .site-header .container {
+        flex-wrap: wrap;
+        row-gap: 0.75rem;
+    }
+
+    .site-header nav {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.6rem 1.1rem;
+    }
+
+    .site-header nav a {
+        font-size: 0.85rem;
+    }
 }
 
 .brand {
@@ -811,7 +831,7 @@ h1, .brand {
     }
 }
 
-/* Kalau pengguna mematikan animasi di sistemnya, garis field
+/* Kalau user mematikan animasi di sistemnya, garis field
    akan tetap muncul lewat CSS biasa dan tidak ada gerakan lain. */
 @media (prefers-reduced-motion: reduce) {
     .field input:focus ~ .field-line,
