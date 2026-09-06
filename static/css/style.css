@@ -578,3 +578,244 @@ h1, .brand {
         height: 100%;
     }
 }
+
+/* Bagian Contacts */
+.contact {
+    position: relative;
+    overflow: hidden;
+    padding: 4.5rem 0 5rem;
+    /* Pita hangat supaya bagian penutup halaman terasa beda dari section lain. */
+    background-color: #f3d9b6;
+}
+
+/* Lapisan noise sebagai hiasan, jadi tidak menangkap klik. */
+.contact::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("/static/img/noise.svg");
+}
+
+.contact-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.contact-title {
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+    text-align: center;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+}
+
+.contact-intro {
+    max-width: 44ch;
+    margin: 0 auto 2.75rem;
+    text-align: center;
+    color: var(--accent-dark);
+    font-weight: 500;
+}
+
+/* Kartu formulir */
+.contact-card-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.contact-card {
+    background-color: #fbf7f2;
+    border: 1px solid rgba(217, 93, 57, 0.18);
+    border-radius: 18px;
+    box-shadow: 0 18px 40px rgba(120, 70, 40, 0.08);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+}
+
+.contact-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.15rem;
+}
+
+.field {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.field label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent);
+    transform-origin: left center;
+    width: fit-content;
+}
+
+.field input,
+.field textarea {
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--ink);
+    background-color: transparent;
+    border: 1px solid rgba(217, 93, 57, 0.35);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.field input:focus,
+.field textarea:focus {
+    border-color: var(--accent);
+    background-color: #fff;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+    color: #a89e93;
+}
+
+.field textarea {
+    resize: vertical;
+    min-height: 180px;
+}
+
+/* Garis aksen di dasar field, dianimasikan oleh anime.js */
+.field-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    border-radius: 999px;
+    background-color: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+    pointer-events: none;
+}
+
+/* Tombol kirim dengan blok pucat yang menyembul di kiri bawah */
+.contact-submit-wrap {
+    position: relative;
+    margin-top: 0.35rem;
+}
+
+.contact-submit-wrap::before {
+    content: "";
+    position: absolute;
+    left: -0.85rem;
+    bottom: -0.85rem;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(217, 93, 57, 0.18);
+    border-radius: 12px;
+    z-index: 0;
+}
+
+.contact-submit {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+    background-color: var(--accent);
+    border: none;
+    border-radius: 12px;
+    padding: 0.95rem 1.4rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.contact-submit:hover {
+    background-color: var(--accent-dark);
+}
+
+.contact-submit:disabled {
+    cursor: default;
+    background-color: var(--accent-dark);
+}
+
+.contact-submit-icon {
+    font-size: 1.2rem;
+}
+
+.contact-status {
+    min-height: 1.2rem;
+    margin-top: 0.75rem;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+    opacity: 0;
+}
+
+/* Deretan ikon kanal kontak */
+.contact-icons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 3rem;
+}
+
+.contact-icon {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background-color: var(--accent);
+    color: #fff;
+    font-size: 1.35rem;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.contact-icon:hover,
+.contact-icon:focus-visible {
+    background-color: var(--accent-dark);
+}
+
+@media (max-width: 600px) {
+    .contact-row {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-card {
+        padding: 1.35rem;
+    }
+
+    .contact-submit-wrap::before {
+        left: -0.6rem;
+        bottom: -0.6rem;
+    }
+
+    .contact-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Kalau pengguna mematikan animasi di sistemnya, garis field
+   akan tetap muncul lewat CSS biasa dan tidak ada gerakan lain. */
+@media (prefers-reduced-motion: reduce) {
+    .field input:focus ~ .field-line,
+    .field textarea:focus ~ .field-line {
+        transform: scaleX(1);
+    }
+}

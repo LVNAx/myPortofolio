@@ -73,15 +73,18 @@ Website portofolio pribadi yang dibangun menggunakan **Django (Python)**, **HTML
 
 Selama pengerjaan proyek ini, saya menggunakan Claude AI sebagai alat bantu belajar dan debugging:
 
-- **[Chat 1](https://claude.ai/share/6ab852d3-616f-43c0-827b-87ff9f941c42)** yang digunakan untuk membantu menulis kode CSS pada section Experience.
-- **[Chat 2](https://claude.ai/share/38ad5efd-cb8e-459f-a989-0f88d101908b)** yang digunakan untuk berdiskusi mengenai maksud dari suatu syntax agar pemahaman saya jauh lebih mendalam, bukan sekadar copy-paste.
+- **[Chat 1-Model: Claude Sonnet-5 Medium](https://claude.ai/share/6ab852d3-616f-43c0-827b-87ff9f941c42)** yang digunakan untuk membantu menulis kode CSS pada section Experience. 
+- **[Chat 2-Model: Claude Sonnet-5 Medium](https://claude.ai/share/38ad5efd-cb8e-459f-a989-0f88d101908b)** yang digunakan untuk berdiskusi mengenai maksud dari suatu syntax agar pemahaman saya jauh lebih mendalam, bukan sekadar copy-paste.
+- **[Chat 2-Model: Claude Opus-5 High](https://claude.ai/share/b40b3597-574c-4d17-af71-14b73221fd57)** yang digunakan untuk membuat section `contact` untuk mengetahui jika AI yang full membuat akan bagaimana. Di sini saya juga mencoba menggunakan animejs.com dan juga formspree.com agar ia benar-benar akan terkirim ke dalam email saya.
+
+
 
 **Refleksi penggunaan AI:**
-AI cukup membantu saya dalam memahami kode lebih lanjut, khususnya untuk mengecek syntax kode mana yang bermasalah beserta solusinya. Namun, kekurangannya terletak pada seberapa jelas konteks permasalahan yang diberikan, sesuai prinsip *garbage-in, garbage-out*, jadi seperti kalo kita memberi konteks yang kurang jelas, hasil yang diberikan AI juga kurang tepat. Selain itu juga, sejauh ini saya temukan kalo tampilan dari website yang dibuat oleh AI itu akan selalu mirip (jika tidak menggunakan Skill-skill tertentu -> Informasi dari internet).
+AI cukup membantu saya dalam memahami kode lebih lanjut, khususnya untuk mengecek syntax kode mana yang bermasalah beserta solusinya. Namun, kekurangannya terletak pada seberapa jelas konteks permasalahan yang diberikan, sesuai prinsip *garbage-in, garbage-out*, jadi seperti kalo kita memberi konteks yang kurang jelas, hasil yang diberikan AI juga kurang tepat. Selain itu juga, berdasarkan chat untuk section `contact`, saya temukan kalo tampilan dari website yang dibuat oleh AI itu akan selalu mirip (jika tidak menggunakan Skill-skill tertentu -> Informasi dari internet). Oleh karena itu, kita perlu menyesuaikan lagi keinginan kita seperti apa dan jangan sampai kita yang dikendalikan gitu.
 
 ## Permasalahan yang Ditemukan
 
-Tantangan terbesar dalam proses ini adalah menentukan tata letak (layout) elemen-elemen pada halaman, yang melibatkan banyak trial and error. Ganti syntax (maupun style) dan juga reload menjadi makanan saya hampir setiap jam.
+Tantangan terbesar dalam proses ini adalah menentukan tata letak (layout) elemen-elemen pada halaman, yang melibatkan banyak trial and error. Ganti syntax (maupun style) serta juga reload dan `python manage.py runserver` menjadi makanan saya hampir setiap jam.
 
 ## Pertanyaan Reflektif
 
