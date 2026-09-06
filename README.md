@@ -64,20 +64,20 @@ Website portofolio pribadi yang dibangun menggunakan **Django (Python)**, **HTML
 
 ## Referensi
 
-- [cornellius.dev](https://www.cornellius.dev/) — referensi utama, khususnya untuk section Experience
-- [Tutorial YouTube](https://www.youtube.com/watch?v=t5AE66WgQD0) — referensi khusus untuk section Education
-- [vinren.id](https://vinren.id/) — referensi tambahan
-- [hakimnizami.dev](https://hakimnizami.dev/) — referensi tambahan
+- [cornellius.dev](https://www.cornellius.dev/) --> referensi utama, khususnya untuk section Experience
+- [Tutorial YouTube](https://www.youtube.com/watch?v=t5AE66WgQD0) --> referensi khusus untuk section Education
+- [vinren.id](https://vinren.id/) --> referensi tambahan
+- [hakimnizami.dev](https://hakimnizami.dev/) --> referensi tambahan
 
 ## AI Disclosure
 
 Selama pengerjaan proyek ini, saya menggunakan Claude AI sebagai alat bantu belajar dan debugging:
 
-- **[Chat 1](https://claude.ai/share/6ab852d3-616f-43c0-827b-87ff9f941c42)** — digunakan untuk membantu menulis kode CSS pada section Experience.
-- **[Chat 2](https://claude.ai/share/38ad5efd-cb8e-459f-a989-0f88d101908b)** — digunakan untuk berdiskusi mengenai maksud dari suatu syntax agar pemahaman saya jauh lebih mendalam, bukan sekadar copy-paste.
+- **[Chat 1](https://claude.ai/share/6ab852d3-616f-43c0-827b-87ff9f941c42)** yang digunakan untuk membantu menulis kode CSS pada section Experience.
+- **[Chat 2](https://claude.ai/share/38ad5efd-cb8e-459f-a989-0f88d101908b)** yang digunakan untuk berdiskusi mengenai maksud dari suatu syntax agar pemahaman saya jauh lebih mendalam, bukan sekadar copy-paste.
 
 **Refleksi penggunaan AI:**
-AI cukup membantu dalam memahami kode lebih lanjut, khususnya untuk mengecek bagian kode mana yang bermasalah beserta solusinya. Namun, kekurangannya terletak pada seberapa jelas konteks permasalahan yang diberikan — sesuai prinsip *garbage-in, garbage-out*: jika konteks yang diberikan kurang jelas, hasil yang diberikan AI juga kurang tepat.
+AI cukup membantu saya dalam memahami kode lebih lanjut, khususnya untuk mengecek syntax kode mana yang bermasalah beserta solusinya. Namun, kekurangannya terletak pada seberapa jelas konteks permasalahan yang diberikan, sesuai prinsip *garbage-in, garbage-out*, jadi seperti kalo kita memberi konteks yang kurang jelas, hasil yang diberikan AI juga kurang tepat. Selain itu juga, sejauh ini saya temukan kalo tampilan dari website yang dibuat oleh AI itu akan selalu mirip (jika tidak menggunakan Skill-skill tertentu -> Informasi dari internet).
 
 ## Permasalahan yang Ditemukan
 
@@ -85,20 +85,18 @@ Tantangan terbesar dalam proses ini adalah menentukan tata letak (layout) elemen
 
 ## Pertanyaan Reflektif
 
-> *Bagian ini diisi langsung oleh penulis.*
+**1. Pada Tutorial dan Tugas 1, Anda diberi kebebasan untuk menentukan tampilan dari website portofolio Anda. Saat Anda merancang struktur HTML yang digunakan, apakah Anda menggunakan elemen semantik HTML5 seperti `section`, `article`, atau `aside`? Jika iya, bagaimana elemen tersebut membantu Anda dalam membuat static web? Jika tidak, mengapa tanpa elemen tersebut sudah memenuhi kebutuhan desain Anda?**
 
-**1. Pada Tutorial dan Tugas 1, Anda diberi kebebasan untuk menentukan tampilan dari website portofolio Anda. Saat Anda merancang struktur HTML yang digunakan, apakah Anda menggunakan elemen semantik HTML5 seperti <section>, <article>, atau <aside>? Jika iya, bagaimana elemen tersebut membantu Anda dalam membuat static web? Jika tidak, mengapa tanpa elemen tersebut sudah memenuhi kebutuhan desain Anda?**
-
-Jawaban: Iya, saya menggunakan itu terutama untuk tag <section>, sedangkan <article> dan <aside> belum ada. Untuk <section> sendiri memudahkan saya untuk 'mempartisi' bagian-bagian yang ada dalam sebuah website sehingga saya bisa menerapkan style yang berbeda-beda dan yang saya inginkan di setiap section. Nah, jika tidak menurutku mungkin ada tag yang lebih cocok, misalnya di sini saya menemukan tag <details> dan juga <summary> yang saya gunakan di section `experience` di mana ia bisa menampilkan informasi intinya di depan dan untuk yang lebih lengkap bisa dengan diklik (untuk kasus saya seperti itu).
+Jawaban: Iya, saya menggunakan itu terutama untuk tag `section`, sedangkan `article` dan `aside` belum ada. Untuk `section` sendiri memudahkan saya untuk 'mempartisi' bagian-bagian yang ada dalam sebuah website sehingga saya bisa menerapkan style yang berbeda-beda dan yang saya inginkan di setiap section. Nah, jika tidak menurutku mungkin ada tag yang lebih cocok, misalnya di sini saya menemukan tag `details` dan juga `summary` yang saya gunakan di section `experience` di mana ia bisa menampilkan informasi intinya di depan dan untuk yang lebih lengkap bisa dengan diklik (untuk kasus saya seperti itu).
 
 **2. Ketika Anda mengatur CSS Anda agar tetap responsive, tantangan tata letak apa yang Anda temukan? Bagaimana Anda mengevaluasi elemen mana yang harus diubah posisinya atau diprioritaskan ukurannya saat berpindah dari tampilan desktop ke mobile?**
 
-Jawaban: Ini lagi-lagi adalah bagaimana dalam menentukan tata letak yang sesuai dengan ukuran yang enak juga, jadi ambil contoh di section <education> yang mana tampilan antara di laptop dan juga hp itu perlu disesuaikan lagi dengan card sama arrownya menjadi rata kiri agar lebih nyaman untuk dilihat. Nah, lagi-lagi masalah yang seperti ini itu saya temukan di section <education> di mana intinya dari card yang sebelumnya ada 2 sisi, sekarang dijadikan sama rata dari kiri semua dan juga sejauh ini solusi yang diambil adalah dikecilkan / dicompactkan agar tetap nyaman dilihat.
+Jawaban: Ini lagi-lagi adalah bagaimana dalam menentukan tata letak yang sesuai dengan ukuran yang enak juga, jadi ambil contoh di section `education` yang mana tampilan antara di laptop dan juga hp itu perlu disesuaikan lagi dengan card sama arrownya menjadi rata kiri agar lebih nyaman untuk dilihat. Nah, lagi-lagi masalah yang seperti ini itu saya temukan di section `education` di mana intinya dari card yang sebelumnya ada 2 sisi, sekarang dijadikan sama rata dari kiri semua dan juga sejauh ini solusi yang diambil adalah dikecilkan / dicompactkan agar tetap nyaman dilihat.
 
 
 **3. Website yang Anda buat saat ini adalah static web murni. Batasan apa yang Anda rasakan saat mencoba menyajikan informasi pada portofolio Anda secara optimal? Berdasarkan batasan tersebut, fungsionalitas dinamis apa yang paling ingin Anda persiapkan dan tambahkan pada iterasi proyek selanjutnya?**
 
-Jawaban: Menurutku sendiri adalah ia kurang interaktif dengan user (jika dibandingkan dengan referensi yang saya temui) yang membuat ia kurang menarik dan membosankan, meskipun saya sudah menambahkan section <experience> yang bisa terbuka ke bawah dan ada garis yang melebar. Nah, terkait fungsionalitas dinamis ada beberapa (ada beberapa yang ngga feasible utk proyek selanjutnya):
+Jawaban: Menurutku sendiri adalah ia kurang interaktif dengan user (jika dibandingkan dengan referensi yang saya temui) yang membuat ia kurang menarik dan membosankan, meskipun saya sudah menambahkan section `experience` yang bisa terbuka ke bawah dan ada garis yang melebar. Nah, terkait fungsionalitas dinamis ada beberapa (ada beberapa yang ngga feasible utk proyek selanjutnya):
 - Kotak yang lebih rapi dan clean, di mana ia kayak ada outer line yang bagus juga,
 - Background yang interaktif seperti milik Kak Kevin Cornellius,
 - Font yang menurutku masih kurang menarik,
