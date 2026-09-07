@@ -35,6 +35,10 @@ h1, .brand {
 
 /* Header dengan Flexbox */
 .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: var(--paper);
     border-bottom: 1px solid var(--line);
 }
 
@@ -46,25 +50,8 @@ h1, .brand {
     gap: 1rem; 
 }
 
+
 /* Navbar di Mobile sebelumnya perlu di-scroll */
-@media (max-width: 600px) {
-    .site-header .container {
-        flex-wrap: wrap;
-        row-gap: 0.75rem;
-    }
-
-    .site-header nav {
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 0.6rem 1.1rem;
-    }
-
-    .site-header nav a {
-        font-size: 0.85rem;
-    }
-}
-
 .brand {
     font-size: 1.3rem;
     font-weight: 700;
@@ -81,6 +68,91 @@ h1, .brand {
     color: var(--ink);
     text-decoration: none;
     font-size: 0.95rem;
+}
+
+/* Tombol hamburger, disembunyikan di desktop */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.nav-toggle span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Animasi jadi tanda silang saat menu terbuka */
+.nav-toggle.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.nav-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (max-width: 768px) {
+    .site-header .container {
+        flex-wrap: wrap;
+        row-gap: 0;
+    }
+
+    .nav-toggle {
+        display: flex;
+    }
+
+    .site-header nav {
+        position: static;
+        flex-basis: 100%;
+        order: 3;
+        flex-direction: column;
+        gap: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .site-header nav.active {
+        max-height: 400px;
+        margin-top: 1rem;
+        border-top: 1px solid var(--line);
+    }
+
+    .site-header nav a {
+        padding: 0.9rem 0.25rem;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .site-header nav a:last-child {
+        border-bottom: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-header nav,
+    .nav-toggle span {
+        transition: none;
+    }
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 /* Section Hero dengan CSS Grid */
@@ -213,10 +285,6 @@ h1, .brand {
     .hero-photo {
         max-width: 220px;
     }
-
-    .social-links {
-        justify-content: flex-start;
-    }
 }
 
 /*  */
@@ -347,10 +415,6 @@ h1, .brand {
     padding: 0.5rem 1.5rem 1.75rem calc(1.25rem + 56px + 1.5rem);
     color: var(--text-muted);
     background-color: transparent;
-}
-
-.experience-details p { /* Ini untuk tag <p>*/
-    margin-bottom: 0.75rem;
 }
 
 .experience-details ul { /* Ini untuk tag <ul>*/
@@ -556,9 +620,7 @@ h1, .brand {
         margin-left: -1.5px;
     }
 
-    .container-timeline,
-    .left-container,
-    .right-container {
+    .container-timeline {
         width: 100%;
         left: 0;
         padding-left: 52px;

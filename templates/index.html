@@ -8,15 +8,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
+
 <body>
     <header class="site-header">
         <div class="container">
             <a href="#profile" class="brand">Nugraha</a>
-            <nav>
+            <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav id="siteNav">
                 <a href="#profile">Profile</a>
                 <a href="#about">About</a>
                 <a href="#education">Education</a>
@@ -27,6 +33,7 @@
     </header>
     
     <!-- Bagian Utamanya -->
+    <main>
         <!-- Section Hero -->
         <section class="hero" id="profile">
             <div class="container hero-grid">
@@ -51,12 +58,12 @@
                         </div>
                     </dl>
                     <div class="social-links">
-                        <a href="https://github.com/LVNAx" class="social-link" target="_blank" rel="noopener">
+                        <a href="https://github.com/LVNAx" class="social-link" target="_blank" rel="noopener">  
                             <i class="devicon-github-original"></i></a>
                         <a href="https://www.linkedin.com/in/nugrahakc" class="social-link" target="_blank" rel="noopener">
                             <i class="devicon-linkedin-plain"></i></a>
-                        <a href="mailto:nugrahakc.com" class="social-link">Email</a>
-                        <a href="https://drive.google.com/file/d/136sJkpda_LMqWngHVFw7ASPczF36OqH-/view?usp=sharing" class="social-link" target="_blank"target="_blank" rel="noopener">Resume</a>
+                        <a href="mailto:nugrakc@gmail.com" class="social-link">Email</a>
+                        <a href="https://drive.google.com/file/d/136sJkpda_LMqWngHVFw7ASPczF36OqH-/view?usp=sharing" class="social-link" target="_blank rel="noopener">Resume</a>
                     </div>
                 </div>
             </div>
@@ -86,7 +93,7 @@
                     <img class="timeline-avatar" src="/static/img/alazhar.png" alt="Logo SMP Islam Al Azhar 17 Pontianak" width="40" height="40">
                     <div class="text-box">
                         <h3>SMP Islam Al Azhar 17 Pontianak</h3>
-                        <small">2019—2022</small>
+                        <small>2019—2022</small>
                         <ul>
                             <li>Bronze Medalist, Fermat Competition.</li>
                             <li>Ranked 1st in school examination scores across the graduating cohort.</li>
@@ -100,7 +107,7 @@
                     <img class="timeline-avatar" src="/static/img/sman1.png" alt="Logo SMA Negeri 1 Pontianak" width="40" height="40">
                     <div class="text-box">
                         <h3>SMA Negeri 1 Pontianak</h3>
-                        <small">2022—2025</small>
+                        <small>2022—2025</small>
                         <ul>
                             <li>Top 3, National Science Olympiad (OSN) in Astronomy, Provincial Level.</li>
                             <li>Top 3, Physics Quiz Bowl Competition, Faculty of Mathematics and Natural Sciences, Universitas Tanjungpura.</li>
@@ -114,7 +121,7 @@
                     <img class="timeline-avatar" src="/static/img/ui.png" alt="Logo Universitas Indonesia" width="40" height="40">
                     <div class="text-box">
                         <h3>Universitas Indonesia</h3>
-                        <small">2025—Present</small>
+                        <small>2025—Present</small>
                         <ul>
                             <li>Top 10, ASN Digital AI Hackathon 2025.</li>
                             <li>Top 38, Datavidia 2026.</li>
@@ -242,7 +249,7 @@
 
             <!-- Ikon-ikon kontak -->
             <div class="contact-icons">
-                <a class="contact-icon" href="mailto:nugraha@gmail.com" aria-label="Email" title="Email" data-icon>
+                <a class="contact-icon" href="mailto:nugrahakc@gmail.com" aria-label="Email" title="Email" data-icon>
                     <i class="material-icons">mail</i>
                 </a>
                 <a class="contact-icon" href="https://github.com/LVNAx" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub" data-icon>
@@ -266,5 +273,26 @@
             <p>&copy; 2026 Nugraha. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
         </div>
     </footer>
+
+
+<script>
+    // Navbar
+    const navToggle = document.querySelector('.nav-toggle');
+    const siteNav = document.getElementById('siteNav');
+
+    navToggle.addEventListener('click', () => {
+        const isActive = siteNav.classList.toggle('active');
+        navToggle.classList.toggle('active');
+        navToggle.setAttribute('aria-expanded', isActive);
+    });
+
+    siteNav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            siteNav.classList.remove('active');
+            navToggle.classList.remove('active');
+            navToggle.setAttribute('aria-expanded', false);
+        });
+    });
+</script>
 </body>
 </html>

@@ -75,7 +75,8 @@ Selama pengerjaan proyek ini, saya menggunakan Claude AI sebagai alat bantu bela
 
 - **[Chat 1-Model: Claude Sonnet-5 Medium](https://claude.ai/share/6ab852d3-616f-43c0-827b-87ff9f941c42)** yang digunakan untuk membantu menulis kode CSS pada section Experience. 
 - **[Chat 2-Model: Claude Sonnet-5 Medium](https://claude.ai/share/38ad5efd-cb8e-459f-a989-0f88d101908b)** yang digunakan untuk berdiskusi mengenai maksud dari suatu syntax agar pemahaman saya jauh lebih mendalam, bukan sekadar copy-paste.
-- **[Chat 2-Model: Claude Opus-5 High](https://claude.ai/share/b40b3597-574c-4d17-af71-14b73221fd57)** yang digunakan untuk membuat section `contact` untuk mengetahui jika AI yang full membuat akan bagaimana. Di sini saya juga mencoba menggunakan animejs.com dan juga formspree.com agar ia benar-benar akan terkirim ke dalam email saya.
+- **[Chat 3-Model: Claude Opus-5 High](https://claude.ai/share/b40b3597-574c-4d17-af71-14b73221fd57)** yang digunakan untuk membuat section `contact` untuk mengetahui jika AI yang full membuat akan bagaimana. Di sini saya juga mencoba menggunakan animejs.com dan juga formspree.com agar ia benar-benar akan terkirim ke dalam email saya.
+- **[Chat 4-Model: Claude Sonnet-5 High](https://claude.ai/share/3343ab50-f83d-44b5-9ff0-3bb20246ba08)** digunakan untuk membuat hamburger stack karena navbar belum responsive untuk tampilan mobile
 
 
 
@@ -95,6 +96,8 @@ Jawaban: Iya, saya menggunakan itu terutama untuk tag `section`, sedangkan `arti
 **2. Ketika Anda mengatur CSS Anda agar tetap responsive, tantangan tata letak apa yang Anda temukan? Bagaimana Anda mengevaluasi elemen mana yang harus diubah posisinya atau diprioritaskan ukurannya saat berpindah dari tampilan desktop ke mobile?**
 
 Jawaban: Ini lagi-lagi adalah bagaimana dalam menentukan tata letak yang sesuai dengan ukuran yang enak juga, jadi ambil contoh di section `education` yang mana tampilan antara di laptop dan juga hp itu perlu disesuaikan lagi dengan card sama arrownya menjadi rata kiri agar lebih nyaman untuk dilihat. Nah, lagi-lagi masalah yang seperti ini itu saya temukan di section `education` di mana intinya dari card yang sebelumnya ada 2 sisi, sekarang dijadikan sama rata dari kiri semua dan juga sejauh ini solusi yang diambil adalah dikecilkan / dicompactkan agar tetap nyaman dilihat.
+
+Setelah mengikuti perkuliahan pada hari Senin, saya disarankan oleh teman saya untuk menggunakan Hamburger Stack terkait dengan navbar saya yang masih kurang responsive juga :D
 
 
 **3. Website yang Anda buat saat ini adalah static web murni. Batasan apa yang Anda rasakan saat mencoba menyajikan informasi pada portofolio Anda secara optimal? Berdasarkan batasan tersebut, fungsionalitas dinamis apa yang paling ingin Anda persiapkan dan tambahkan pada iterasi proyek selanjutnya?**
