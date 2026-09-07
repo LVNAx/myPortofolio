@@ -6,6 +6,9 @@
 }
 
 :root {
+    --font-sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-display: "Space Grotesk", -apple-system, sans-serif;
+
     --ink: #1c1917;
     --paper: #faf6f0;
     --accent: #d95d39;
@@ -16,15 +19,14 @@
 }
 
 body {
-    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-sans);
     color: var(--ink);
     background-color: var(--paper);
     line-height: 1.6;
 }
 
-
-h1, .brand {
-    font-family: "Space Grotesk", -apple-system, sans-serif;
+h1, .brand, .section-title, .contact-title {
+    font-family: var(--font-display);
 }
 
 .container {
@@ -423,10 +425,7 @@ html {
 
 .experience-details li { /* Ini untuk tag <li> */
     margin-bottom: 0.4rem;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    color: black;
     font-weight: 400;
-    
 }
 
 
@@ -687,7 +686,6 @@ html {
 }
 
 .contact-title {
-    font-family: "Space Grotesk", -apple-system, sans-serif;
     text-align: center;
     color: var(--accent);
     margin-bottom: 1.25rem;
