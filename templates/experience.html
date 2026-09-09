@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Bagian resources seperti font, dll. -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ name }} Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=3">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
+            <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav id="siteNav">
+                <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_main' %}#about">About</a>
+                <a href="{% url 'main:show_main' %}#education">Education</a>
+                <a href="{% url 'main:show_main' %}#experience">Experience</a>
+                <a href="{% url 'main:show_main' %}#contact">Contact</a>
+                <a href="{% url 'main:show_experience' %}">Experience_T2</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Bagian Utamanya -->
+    <main>
+        <section class="experience-section2" id="experience-t2">
+            <div class="container">
+                <p class="section-kicker2">Perjalanan saya sejauh ini</p>
+                <h1>Experience</h1>
+
+                <div class="experience-grid2">
+                    {% for experience in experience_list %}
+                        <article class="experience-card2">
+                            <span class="experience-category2">
+                                {{ experience.get_category_display }}
+                            </span>
+                            <h2>{{ experience.title }}</h2>
+                            <p class="experience-description2">
+                                {{ experience.description }}
+                            </p>
+
+                            {% if experience.is_ongoing %}
+                                <p class="experience-status2">Sedang berlangsung</p>
+                            {% else %}
+                                <p class="experience-status2">Selesai</p>
+                            {% endif %}
+                        </article>
+                    {% empty %}
+                        <p class="empty-state2">
+                            Belum ada pengalaman yang ditambahkan.
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+        </div>
+    </footer>
+
+<script>
+    // Navbar
+    const navToggle = document.querySelector('.nav-toggle');
+    const siteNav = document.getElementById('siteNav');
+
+    navToggle.addEventListener('click', () => {
+        const isActive = siteNav.classList.toggle('active');
+        navToggle.classList.toggle('active');
+        navToggle.setAttribute('aria-expanded', isActive);
+    });
+
+    siteNav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            siteNav.classList.remove('active');
+            navToggle.classList.remove('active');
+            navToggle.setAttribute('aria-expanded', false);
+        });
+    });
+</script>
+</body>
+</html>
