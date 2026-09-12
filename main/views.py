@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Person, Post, Mahasiswa, Experience
+from .models import Person, Post, Mahasiswa, Experience, Project
 
 PROFILE = {
     "name": "Nugraha",
@@ -26,3 +26,10 @@ def show_experience(request):
         "experience_list": Experience.objects.all(),
     }
     return render(request, "experience.html", context)
+
+def project_list(request):
+    context = {
+        **PROFILE,
+        "projects": Project.objects.all(),
+    }
+    return render(request, "projects.html", context)

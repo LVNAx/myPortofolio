@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ name }} - Projects</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=3">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="{% url 'main:project_list' %}" class="brand">{{ name }}</a>
+            <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav id="siteNav">
+                <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_main' %}#about">About</a>
+                <a href="{% url 'main:show_main' %}#education">Education</a>
+                <a href="{% url 'main:show_main' %}#experience">Experience</a>
+                <a href="{% url 'main:show_main' %}#contact">Contact</a>
+                <a href="{% url 'main:show_experience' %}">Experience_T2</a>
+                <a href="{% url 'main:project_list' %}">Projects</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Bagian Utamanya -->
+    <main>
+        <section class="projects-section" id="projects">
+            <div class="container">
+                <p class="section-kicker2">Apa saja yang pernah saya bangun</p>
+                <h1>Projects</h1>
+
+                <div class="project-grid">
+                    {% for project in projects %}
+                        <article class="project-card">
+                            {% if project.thumbnail %}
+                                <img src="{% static project.thumbnail %}"
+                                    alt="Tangkapan layar {{ project.title }}"
+                                    class="project-thumb">
+                            {% endif %}
+
+                            <span class="experience-category2">
+                                {{ project.get_category_display }}
+                            </span>
+
+                            <h2>{{ project.title }}</h2>
+                            <p class="project-role">{{ project.role }}</p>
+
+                            <p class="experience-description2">
+                                {{ project.description }}
+                            </p>
+
+                            {% if project.highlight_list %}
+                                <ul class="project-highlights">
+                                    {% for point in project.highlight_list %}
+                                        <li>{{ point }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+
+                            <div class="project-tags">
+                                {% for tech in project.tech_list %}
+                                    <span class="project-tag">{{ tech }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <p class="experience-status2">
+                                {% if project.is_ongoing %}Sedang berlangsung{% else %}Selesai{% endif %}
+                            </p>
+
+                            <div class="project-links">
+                                {% if project.live_url %}
+                                    <a href="{{ project.live_url }}" class="social-link" target="_blank" rel="noopener">Live Site</a>
+                                {% endif %}
+                                {% if project.github_url %}
+                                    <a href="{{ project.github_url }}" class="social-link" target="_blank" rel="noopener">GitHub</a>
+                                {% endif %}
+                            </div>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state2">
+                            Belum ada proyek yang ditambahkan.
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+        </div>
+    </footer>
+
+<script>
+    // Navbar
+    const navToggle = document.querySelector('.nav-toggle');
+    const siteNav = document.getElementById('siteNav');
+
+    navToggle.addEventListener('click', () => {
+        const isActive = siteNav.classList.toggle('active');
+        navToggle.classList.toggle('active');
+        navToggle.setAttribute('aria-expanded', isActive);
+    });
+
+    siteNav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            siteNav.classList.remove('active');
+            navToggle.classList.remove('active');
+            navToggle.setAttribute('aria-expanded', false);
+        });
+    });
+</script>
+</body>
+</html>

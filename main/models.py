@@ -45,3 +45,47 @@ class Experience(models.Model):
     @property
     def is_ongoing(self):
         return self.ended_at is None
+
+import uuid
+from django.db import models
+
+
+class Project(models.Model):
+    CATEGORY_CHOICES = [
+        ("web", "Web Development"),
+        ("data", "Data Science"),
+        ("competition", "Competition"),
+        ("course", "Course Project"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Samakan aja pakai ID kayak Experience
+    title = models.CharField(max_length=120)
+    role = models.CharField(max_length=120)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="web")
+    description = models.TextField()
+    highlights = models.TextField(blank=True, help_text="Satu project dalam satu baris")
+    tech_stack = models.CharField(max_length=200, help_text="Pisahkan dengan koma")
+    thumbnail = models.CharField(max_length=200, blank=True)
+    live_url = models.URLField(blank=True)
+    github_url = models.URLField(blank=True)
+    started_at = models.DateField()
+    ended_at = models.DateField(blank=True, null=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "-started_at"]
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def is_ongoing(self):
+        return self.ended_at is None
+
+    @property
+    def tech_list(self):
+        return [t.strip() for t in self.tech_stack.split(",") if t.strip()]
+
+    @property
+    def highlight_list(self):
+        return [line.strip() for line in self.highlights.splitlines() if line.strip()]

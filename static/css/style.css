@@ -954,3 +954,43 @@ html {
     font-size: 0.85rem;
     font-weight: 600;
 }
+
+.project-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.project-card {
+    flex: 0 1 340px;
+    max-width: 380px;
+    padding: 1.25rem;
+    background-color: #fff;
+    border: 1px solid var(--line);
+    border-radius: calc(var(--radius) * 4);
+}
+
+.project-thumb {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+}
+
+.project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+}
+
+.project-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+    background-color: rgba(217, 93, 57, 0.1);
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+}
