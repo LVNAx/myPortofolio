@@ -1,0 +1,298 @@
+/*
+    base.css akan digunakan oleh semua halaman yang akan berisi:
+    Token, Reset & Dasar, Layout, Header & Navbar, Footer, Komponen bersama, Responsive & Aksesibilitas
+*/
+
+/* Token */
+:root {
+    /* Font */
+    --font-sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-display: "Space Grotesk", -apple-system, sans-serif;
+
+    /* Warna */
+    --ink: #1c1917;
+    --paper: #faf6f0;
+    --surface: #ffffff;
+    --accent: #d95d39;
+    --accent-dark: #a8442a;
+    --accent-soft: rgba(217, 93, 57, 0.12);
+    --line: #e3d9c9;
+    --text-muted: #6b6459;
+
+    /* Sudut */
+    --radius: 4px;
+    --radius-sm: 4px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+
+    /* Jarak & bayangan */
+    --space-section: 4rem;
+    --shadow-soft: 0 8px 20px rgba(28, 25, 23, 0.06);
+}
+
+/*
+    Reset dan Dasar.
+
+    Notes:
+    768px = navbar jadi hamburger
+    600px = layout berubah jadi satu kolom
+*/
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-sans);
+    color: var(--ink);
+    background-color: var(--paper);
+    line-height: 1.6;
+}
+
+/* Gambar ngga boleh lebih lebar dari wadahnya */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+h1,
+.brand {
+    font-family: var(--font-display);
+}
+
+/* Layout */
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.page-section {
+    padding: var(--space-section) 0 5rem;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    line-height: 1.1;
+    margin-top: 0.35rem;
+}
+
+/* Header & Navbar */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: var(--paper);
+    border-bottom: 1px solid var(--line);
+}
+
+.site-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+}
+
+.brand {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.site-header nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.site-header nav a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.95rem;
+    padding: 0.2rem 0.6rem;
+    border: 1.5px solid transparent;   /* transparan agar dia ngga "loncat" pas aktif */
+    border-radius: var(--radius-sm);
+    transition: color 0.2s ease;
+}
+
+.site-header nav a:hover {
+    color: var(--accent);
+}
+
+/* Halaman yang sedang dibuka */
+.site-header nav a[aria-current="page"] {
+    font-weight: 700;
+    border-color: var(--ink);
+}
+
+/* Tombol hamburger, disembunyikan di desktop */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-toggle span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: var(--ink);
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Mengubah Hamburger Stack menjadi X */
+.nav-toggle.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle.active span:nth-child(2) { opacity: 0; }
+.nav-toggle.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Footer */
+.site-footer {
+    padding: 1.5rem 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--line);
+}
+
+/* Komponen bersama */
+/* Label kecil di atas judul */
+.kicker {
+    color: var(--accent-dark);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* Kotak putih dengan bingkai */
+.card {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+}
+
+/* Tag */
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.65rem;
+    background-color: var(--surface);
+    border: 1px solid var(--ink);
+    border-radius: var(--radius-sm);
+}
+
+/* Tombol gelap */
+.btn {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--paper);
+    background-color: var(--ink);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 1.1rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn:hover,
+.btn:focus-visible {
+    background-color: var(--accent);
+}
+
+/* Pesan saat data masih kosong */
+.empty-state {
+    color: var(--text-muted);
+    padding: 2rem;
+    text-align: center;
+    border: 1px dashed var(--line);
+    border-radius: var(--radius-md);
+}
+
+/* Responsive & Aksesibilitas */
+@media (max-width: 768px) {
+    .site-header .container {
+        flex-wrap: wrap;
+        row-gap: 0;
+    }
+
+    .nav-toggle {
+        display: flex;
+    }
+
+    .site-header nav {
+        flex-basis: 100%;
+        order: 3;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .site-header nav.active {
+        max-height: 400px;
+        margin-top: 1rem;
+        border-top: 1px solid var(--line);
+    }
+
+    .site-header nav a {
+        padding: 0.9rem 0.75rem;
+        border: none;
+        border-bottom: 1px solid var(--line);
+        border-radius: 0;
+    }
+
+    .site-header nav a:last-child {
+        border-bottom: none;
+    }
+
+    /* Menu ketika aktif di mobile */
+    .site-header nav a[aria-current="page"],
+    .site-header nav a[aria-current="page"]:hover {
+        background-color: var(--ink);
+        color: var(--paper);
+        border-bottom-color: transparent;
+        border-radius: var(--radius-sm);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .site-header nav,
+    .nav-toggle span {
+        transition: none;
+    }
+}
