@@ -1,10 +1,11 @@
 from datetime import date
+from django.core.exceptions import ValidationError
 
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from main.models import Experience, Project
+from main.models import Experience, Project, JourneyStage, StageActivity
 
 class MainTest(TestCase):
     def setUp(self):
@@ -86,14 +87,14 @@ class ProjectTest(TestCase):
         self.assertContains(response, "Web Development")
         self.assertContains(response, "Resend email otomatis")
         self.assertContains(response, "Tailwind CSS")
-        self.assertContains(response, "Sedang berlangsung")
+        self.assertContains(response, "Ongoing")
         self.assertContains(response, self.project.live_url)
 
     def test_empty_project_page(self):
         Project.objects.all().delete()
         response = self.client.get(reverse("main:project_list"))
 
-        self.assertContains(response, "Belum ada proyek yang ditambahkan.")
+        self.assertContains(response, "No projects added yet.")
 
     def test_project_model(self):
         self.assertEqual(str(self.project), "Sandbox")
@@ -109,8 +110,8 @@ class ProjectTest(TestCase):
         response = self.client.get(reverse("main:project_list"))
 
         self.assertFalse(self.project.is_ongoing)
-        self.assertContains(response, "Selesai")
-        self.assertNotContains(response, "Sedang berlangsung")
+        self.assertContains(response, "Completed")
+        self.assertNotContains(response, "Ongoing")
 
     def test_github_button_hidden_when_url_empty(self):
         response = self.client.get(reverse("main:project_list"))
@@ -121,3 +122,70 @@ class ProjectTest(TestCase):
         response = self.client.get(reverse("main:project_list"))
 
         self.assertContains(response, f'href="{reverse("main:show_main")}"')
+
+class JourneyTest(TestCase):
+    def setUp(self):
+        self.stage = JourneyStage.objects.create(
+            name="SMA",
+            school="SMA Negeri 1 Pontianak",
+            start_year=2022,
+            end_year=2025,
+            tags="sains, kompetitif, mandiri",
+            description=" ".join(["belajar" * 60]), # Jadi ada 60 kata
+            order=1,
+        )
+
+        self.activity=StageActivity.objects.create(
+            stage=self.stage,
+            title="Top 3 OSN Astronomi",
+            category=StageActivity.Category.OLIMPIADE,
+            description="Juara tingkat provinsi\nMewakili sekolah",
+            order=1,
+        )
+
+    # URL bisa diakses dan pakai template yang benar
+    def test_journey_url_is_accessible(self):
+        response = self.client.get(reverse("main:show_journey"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "journey.html")
+        self.assertTemplateUsed(response, "base.html")
+
+    # Data dari model muncul di HTML
+    def test_journey_page_displays_data(self):
+        response = self.client.get(reverse("main:show_journey"))
+
+        self.assertContains(response, self.stage.name)
+        self.assertContains(response, self.stage.school)
+        self.assertContains(response, "2022 sampai 2025")
+        self.assertContains(response, "kompetitif")
+        self.assertContains(response, self.activity.title)
+        self.assertContains(response, "Olimpiade")
+        self.assertContains(response, "Mewakili sekolah")
+
+    def test_empty_journey_page(self):
+        JourneyStage.objects.all().delete()
+        response = self.client.get(reverse("main:show_journey"))
+
+        self.assertContains(response, "No stages added yet.")
+        self.assertNotContains(response, "SMA Negeri 1 Pontianak")
+
+    # Navbar punya link Journey dan nandain sebagai halaman yang sedang dilihat
+    def test_navbar_marks_journey_as_current(self):
+        response = self.client.get(reverse("main:show_journey"))
+
+        self.assertContains(response, f'href="{reverse("main:show_journey")}"')
+        self.assertContains(response, 'aria-current="page">Journey</a>')
+
+    # property di model
+    def test_journey_model(self):
+        self.assertEqual(str(self.stage), "SMA (SMA Negeri 1 Pontianak)")
+        self.assertEqual(self.stage.tag_list, ["sains", "kompetitif", "mandiri"])
+        self.assertEqual(len(self.activity.point_list), 2)
+
+    # validator jumlah kata
+    def test_description_word_count_validator(self):
+        self.stage.description = "terlalu pendek"
+
+        with self.assertRaises(ValidationError):
+            self.stage.full_clean()

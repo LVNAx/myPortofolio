@@ -21,6 +21,5 @@ from portofolio.views import landing_page
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('', landing_page, name='landing_page'),
-    path('', include('main.urls')), # Pada tutorial 2, ia seharusnya "", include("main.urls")
+    path('', include('main.urls')), 
 ]

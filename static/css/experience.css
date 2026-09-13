@@ -1,0 +1,46 @@
+/* Styling untuk Experience */
+
+.experience-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+}
+
+.experience-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.experience-category {
+    color: var(--accent-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.experience-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    line-height: 1.25;
+}
+
+.experience-description {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+/* Status selalu di dasar kartu */
+.experience-status {
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--line);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.experience-status--ongoing {
+    color: var(--accent-dark);
+}
