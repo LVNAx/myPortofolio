@@ -1,0 +1,98 @@
+/* Styling untuk Projects */
+
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+/* Gambar akan nempel ke tepi kartu, jadi padding .card akan dinolkan */
+.project-card {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;       /* sudut gambar akan ikut membulat mengikuti kartu */
+}
+
+.project-thumb {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: top;   
+    border-bottom: 1px solid var(--line);
+}
+
+.project-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    flex-grow: 1;           
+    padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.project-category {
+    color: var(--accent-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.project-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    line-height: 1.25;
+}
+
+.project-role {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.project-description {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.project-highlights {
+    padding-left: 1.1rem;
+    font-size: 0.9rem;
+}
+
+.project-highlights li + li {
+    margin-top: 0.25rem;
+}
+
+/* Status dan juga tombol projeknya akan selalu berada di dasar kartu */
+.project-footer {
+    margin-top: auto;
+    padding-top: 0.9rem;
+    border-top: 1px dashed var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.project-status {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.project-status--ongoing {
+    color: var(--accent-dark);
+}
+
+.project-links {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.project-links .btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.9rem;
+}
