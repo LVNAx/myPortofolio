@@ -1,0 +1,127 @@
+/* Styling untuk Journey */
+
+.journey-intro {
+    padding-top: var(--space-section);
+    margin-bottom: 0;
+}
+
+/* Satu section per jenjang */
+.journey-section {
+    padding: 2.5rem 0 3.5rem;
+}
+
+.journey-section + .journey-section {
+    border-top: 1px solid var(--line);
+}
+
+.journey-heading {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 4vw, 2.25rem);
+    line-height: 1.1;
+}
+
+.journey-meta {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+/* Logo nimpa pojok kanan bawah */
+.journey-cover {
+    position: relative;
+    margin-top: 1.5rem;
+}
+
+.journey-photo {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+}
+
+.journey-logo {
+    position: absolute;
+    right: -0.75rem;
+    bottom: -1.25rem;
+    width: clamp(64px, 14vw, 110px);
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    padding: 0.5rem;
+    background-color: var(--surface);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+}
+
+/* Tag-nya rata kanan, di bawah logo */
+.journey-tags {
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.journey-description {
+    margin-top: 1.5rem;
+    max-width: 68ch;
+    font-size: clamp(1.05rem, 1rem + 0.35vw, 1.2rem);
+    line-height: 1.75;
+    text-wrap: pretty;
+}
+
+/* Aktivitas */
+.journey-activities-title {
+    font-family: var(--font-display);
+    text-align: center;
+    margin: 3rem 0 1.25rem;
+}
+
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.activity-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.activity-badge {
+    align-self: flex-start;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.15rem 0.55rem;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius-sm);
+}
+
+.activity-title {
+    font-size: 1rem;
+    color: var(--accent);
+}
+
+.activity-role {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+}
+
+.activity-points {
+    padding-left: 1.1rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.activity-points li + li {
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 600px) {
+    .journey-logo {
+        right: 0.75rem;     /* di HP jangan sampai keluar layar */
+    }
+}

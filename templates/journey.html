@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Journey{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/journey.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header class="page-header journey-intro">
+        <p class="kicker">The road so far</p>
+        <h1 class="page-title">Journey</h1>
+    </header>
+</div>
+
+<!-- Journey saat ini hanya dari SMP, SMA, dan Kuliah -->
+{% for journey in journeys %}
+<section class="journey-section" aria-labelledby="stage-{{ journey.id }}">
+    <div class="container">
+
+        <h2 class="journey-heading" id="stage-{{ journey.id }}">{{ journey.name }}</h2>
+        <p class="journey-meta">{{ journey.school }} · {{ journey.period }}</p>
+
+        {% if journey.photo %}
+        <div class="journey-cover">
+            <img src="{% static journey.photo %}"
+                 alt="Atmosphere at {{ journey.school }}"
+                 class="journey-photo"
+                 loading="lazy">
+            {% if journey.logo %}
+            <img src="{% static journey.logo %}"
+                 alt="{{ journey.school }} logo"
+                 class="journey-logo">
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if journey.tag_list %}
+        <div class="tag-list journey-tags">
+            {% for word in journey.tag_list %}
+            <span class="tag">{{ word }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <p class="journey-description">{{ journey.description }}</p>
+
+        {% with activities=journey.activities.all %}
+        {% if activities %}
+        <h3 class="journey-activities-title">My activities while in {{ journey.school }}</h3>
+        <div class="activity-grid">
+            {% for activity in activities %}
+            <article class="card activity-card">
+                <span class="activity-badge">{{ activity.get_category_display }}</span>
+                <h4 class="activity-title">{{ activity.title }}</h4>
+                {% if activity.role %}
+                <p class="activity-role">{{ activity.role }}</p>
+                {% endif %}
+                <ul class="activity-points">
+                    {% for point in activity.point_list %}
+                    <li>{{ point }}</li>
+                    {% endfor %}
+                </ul>
+            </article>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+    </div>
+</section>
+{% empty %}
+<div class="container">
+    <p class="empty-state">No stages added yet.</p>
+</div>
+{% endfor %}
+{% endblock %}

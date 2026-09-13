@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Projects{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/projects.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+
+        <header class="page-header">
+            <p class="kicker">Things I've built</p>
+            <h1 class="page-title">Projects</h1>
+        </header>
+
+        {% if projects %}
+        <div class="project-grid">
+            {% for project in projects %}
+            <article class="card project-card">
+
+                {% if project.thumbnail %}
+                <img src="{% static project.thumbnail %}"
+                     alt="Screenshot of {{ project.title }}"
+                     class="project-thumb"
+                     loading="lazy">
+                {% endif %}
+
+                <div class="project-body">
+                    <p class="project-category">{{ project.get_category_display }}</p>
+                    <h2 class="project-title">{{ project.title }}</h2>
+                    <p class="project-role">{{ project.role }}</p>
+
+                    <p class="project-description">{{ project.description }}</p>
+
+                    {% if project.highlight_list %}
+                    <ul class="project-highlights">
+                        {% for point in project.highlight_list %}
+                        <li>{{ point }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+
+                    {% if project.tech_list %}
+                    <div class="tag-list">
+                        {% for tech in project.tech_list %}
+                        <span class="tag">{{ tech }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="project-footer">
+                        <span class="project-status{% if project.is_ongoing %} project-status--ongoing{% endif %}">
+                            {% if project.is_ongoing %}Ongoing{% else %}Completed{% endif %}
+                        </span>
+
+                        <div class="project-links">
+                            {% if project.live_url %}
+                            <a href="{{ project.live_url }}" class="btn" target="_blank" rel="noopener">Live Site</a>
+                            {% endif %}
+                            {% if project.github_url %}
+                            <a href="{{ project.github_url }}" class="btn" target="_blank" rel="noopener">GitHub</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">No projects added yet.</p>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

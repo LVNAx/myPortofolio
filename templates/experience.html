@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Experience{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/experience.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+
+        <header class="page-header">
+            <p class="kicker">Perjalanan saya sejauh ini</p>
+            <h1 class="page-title">Experience</h1>
+        </header>
+
+        {% if experience_list %}
+        <div class="experience-grid">
+            {% for experience in experience_list %}
+            <article class="card experience-card">
+                <p class="experience-category">{{ experience.get_category_display }}</p>
+                <h2 class="experience-title">{{ experience.title }}</h2>
+                <p class="experience-description">{{ experience.description }}</p>
+                <p class="experience-status{% if experience.is_ongoing %} experience-status--ongoing{% endif %}">
+                    {% if experience.is_ongoing %}Sedang berlangsung{% else %}Selesai{% endif %}
+                </p>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">Belum ada pengalaman yang ditambahkan.</p>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

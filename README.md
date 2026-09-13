@@ -1,4 +1,9 @@
 # Website Portofolio Pribadi
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white)
 
 `Nama: Nugraha Kautsarrizqi Caksana`
 `Kelas: PBP-B`
@@ -51,6 +56,7 @@ Website portofolio pribadi yang dibangun menggunakan **Django (Python)**, **HTML
 
 6. Buka browser dan akses `http://127.0.0.1:8000/`
 
+# Tugas-1
 ## Progress Mingguan
 
 | Hari / Tanggal | Progress |
@@ -78,8 +84,6 @@ Selama pengerjaan proyek ini, saya menggunakan Claude AI sebagai alat bantu bela
 - **[Chat 3-Model: Claude Opus-5 High](https://claude.ai/share/b40b3597-574c-4d17-af71-14b73221fd57)** yang digunakan untuk membuat section `contact` untuk mengetahui jika AI yang full membuat akan bagaimana. Di sini saya juga mencoba menggunakan animejs.com dan juga formspree.com agar ia benar-benar akan terkirim ke dalam email saya.
 - **[Chat 4-Model: Claude Sonnet-5 High](https://claude.ai/share/3343ab50-f83d-44b5-9ff0-3bb20246ba08)** digunakan untuk membuat hamburger stack karena navbar belum responsive untuk tampilan mobile
 
-
-
 **Refleksi penggunaan AI:**
 AI cukup membantu saya dalam memahami kode lebih lanjut, khususnya untuk mengecek syntax kode mana yang bermasalah beserta solusinya. Namun, kekurangannya terletak pada seberapa jelas konteks permasalahan yang diberikan, sesuai prinsip *garbage-in, garbage-out*, jadi seperti kalo kita memberi konteks yang kurang jelas, hasil yang diberikan AI juga kurang tepat. Selain itu juga, berdasarkan chat untuk section `contact`, saya temukan kalo tampilan dari website yang dibuat oleh AI itu akan selalu mirip (jika tidak menggunakan Skill-skill tertentu -> Informasi dari internet). Oleh karena itu, kita perlu menyesuaikan lagi keinginan kita seperti apa dan jangan sampai kita yang dikendalikan gitu.
 
@@ -87,7 +91,7 @@ AI cukup membantu saya dalam memahami kode lebih lanjut, khususnya untuk mengece
 
 Tantangan terbesar dalam proses ini adalah menentukan tata letak (layout) elemen-elemen pada halaman, yang melibatkan banyak trial and error. Ganti syntax (maupun style) serta juga reload dan `python manage.py runserver` menjadi makanan saya hampir setiap jam.
 
-## Pertanyaan Reflektif
+## Pertanyaan Reflektif Tugas-1
 
 **1. Pada Tutorial dan Tugas 1, Anda diberi kebebasan untuk menentukan tampilan dari website portofolio Anda. Saat Anda merancang struktur HTML yang digunakan, apakah Anda menggunakan elemen semantik HTML5 seperti `section`, `article`, atau `aside`? Jika iya, bagaimana elemen tersebut membantu Anda dalam membuat static web? Jika tidak, mengapa tanpa elemen tersebut sudah memenuhi kebutuhan desain Anda?**
 
@@ -108,3 +112,50 @@ Jawaban: Menurutku sendiri adalah ia kurang interaktif dengan user (jika dibandi
 - Font yang menurutku masih kurang menarik,
 - Scroll down / up yang agak di-delay agar terkesan mewah gtu,
 - Dan mungkin cursor yang keren juga :D
+
+# Tugas-2
+## Progress Mingguan
+
+| Hari / Tanggal | Progress |
+|---|---|
+| Selasa, 8 September | Menyelesaikan Handson |
+| Rabu, 9 September | Menyelesaikan Tutorial 2 |
+| Kamis, 10 September | Memahami kembali kode-kode yang telah dibuat |
+| Jumat, 11 September | Planning akan membuat sebuah entitias dengan attribute apa aja |
+| Sabtu, 12 September | Menyelesaikan bagian Experience |
+| Minggu, 13 September | Menyelesaikan bagian Projects dan juga Journey sambil Refactor besar-besaran agar kodenya jauh lebih rapi |
+| Senin, 14 September | Refactor Experience, menyelesaikan Testing dan juga menambahkan README.md |
+
+
+## AI Disclosure
+
+Selama pengerjaan proyek ini, saya menggunakan Claude AI sebagai alat bantu belajar dan debugging:
+
+- **[Chat 1-Model: Claude Sonnet-5 Medium](https://claude.ai/share/0c60b902-a2e2-40db-881a-af5cedc899ce)** yang digunakan untuk berdiskusi mengenai maksud dari kodenya bagaimana.
+- **[Chat 2-Model: Claude Sonnet-5 Medium](https://claude.ai/share/87a42ee4-f14a-4bc0-b35f-7aeeada8cb31)** sama dengan chat-1, ia digunakan untuk berdiskusi mengenai maksud dari kode bagaimana.
+- **[Chat 3-Model: Claude Sonnet-5 High](https://claude.ai/share/e6abf363-d3d3-4b14-931e-f2fdfdd538e7)** ini adalah chat utama dengan AI di mana digunakan untuk brainstorming (desain websitenya bagiamana dan ada minta beberapa kode dari nya).
+
+
+## Petanyaan Reflektif Tugas-2
+**1. Jelaskan alur yang terjadi ketika pengguna membuka halaman portofolio baru, mulai dari permintaan yang diterima proyek hingga data ditampilkan pada browser. Dalam jawabanmu, jelaskan peran urls.py proyek, urls.py aplikasi, view, model, dan template.**
+
+Jawaban: Di sini kita coba ambil kasus untuk path journey/.
+Jadi, ketika user buka halaman Journey misalnya dengan klik 'Journey' yang ada pada navbar, browser akan mengirimkan ***request*** `GET /journey/` ke server Django. Nah, pertama-tama Django akan membaca `urls.py` milik portofolio (`portofolio/urls.py`) yang memiliki fungsi sebagai gerbang masuk seluruh URL. File ini ngga tau tentang halaman Journey karena tugasnya hanya membagi request ke Django Apps yang tepat. Karena URL tersebut cocok dengan `path('', include('main.urls'))`, sisa dari URL-nya akan diteruskan ke `main/urls.py` yang di mana di sana kan ada `path("journey/", show_journey, name="show_journey")`, sehingga Django memanggil fungsi view  `show_journey` (dari `views.py`). Nama rute inilah yang dipakai pada navbar.
+
+Kemudian, view `show_journey` berperan sebagai penghubung antara model dan juga template. View meminta data kepada model melalui `JourneyStage.objects.prefetch_related("activities").all()`, lalu hasilnya dimasukkan ke dalam `context` dengan data profil, kemudian memanggil `render()` dengan template `journey.html`. Model `JourneyStage` dan `StageActivity` yang terhubung menggunakan **KeyAttribute** berupa ID, akan menerjemahkan kode Python menjadi query SQL ke database. Nah, lalu template `journey.html` menyusun HTML dengan meng-extend dari `base.html` agar bagian head, navbar, dan footer dari sini dan berlaku untuk semua halaman sedangkan `journey.html` hanya mengisi bagian kontennya. Seperti:
+1. `{% for %}` untuk menampilkan setiap jenjang dan aktivitasnya,
+2. `{% empty %}` menampilkan pesan ketika data masih kosong,
+3. `{% static %}` menghasilkan alamat berkas CSS serta gambar.
+Kemudian, hasil render dikirim kembali ke browser sebagai `HttpResponse` berisi HTML. Kemudian proses untuk folder statis hingga akhirnya halaman akan tampil dengan utuh di milik user.
+
+**2. Mengapa data untuk bagian portofolio baru sebaiknya disimpan pada model dan tidak ditulis langsung di dalam template? Jelaskan dampaknya terhadap kemudahan pemeliharaan dan pengembangan aplikasi.**
+
+Jawaban: Kebetulan di sini untuk Profile saya tetap melakukan hardcoded juga dan salah satu yang saya temukan setelah menggunakan model ini adalah `datanya lebih baik  dan lebih nyaman jika disimpan pada model agar ia hanya ada satu sumber data`. Sehingga, ketika kita ingin mengubahnya ia cukup dari Model aja. Selain itu juga, dari sisi penggembangan, data pada model lebih mudah dites dan dipakai lagi. Untuk unit test pula, kita dapat membuat data percobaan lalu memeriksa apakah data tersebut tampil, ataupun menghapusnya untuk memeriksa pesan ketika datanya kosong --> ini tidak bisa dilakukan jika ia hardcoded di html nya langsung.
+
+Kemudian yang terakhir, di admin/ kita juga bisa mengurutkan, memfilter, atau menampilkan datanya ke halaman lain **tanpa ditulis ulang**.
+
+**3. Apa perbedaan fungsi `makemigrations` dan `migrate` pada Django? Berikan contoh perubahan model yang mengharuskanmu menjalankan kedua perintah tersebut.**
+
+Jawaban: Selama tugas 2 ini, saya sadar kalo perbedaan antara keduanya adalah `makemigrations` adalah tahap 'membuat rencana', sedangkan `migrate` adalah tahap 'mengeksekusinya'. `makemigrations` akan membandingkan isi `models.py` dengan migrasi sebelumnya, lalu menuliskan perubahannya ke berkas migrasi baru yang ada di folder `migrations/`, *tanpa mengubah database kita sama sekali*. Berkas inilah yang akan dimasukkan ke github juga agar semua orang dan server memiliki rencana perubahan yang sama. `migrate` kemudian membaca rencana yang belum dijalankan, lalu **benar-benar menerapkannya ke database**, seperti membuat tabel atau menambah kolom.
+
+Contohnya pada proyek ini, ketika saya menambahkan model `JourneyStage` dan `StageActivity`, `makemigrations` menghasilkan berkas `0005_journeystage_stageactivity.py`, lalu `migrate` membuat tabel `journeystage` dan `stageactivity` di database. Nah, Kedua perintah ini hanya diperlukan jika struktur tabel-nya berubah menambah `@property` seperti `tag_list` ngga memerlukan migrasi karena ngga ada kolom yang berubah.
