@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 class Person(models.Model):
     display_name = models.CharField(max_length=30)
@@ -89,3 +90,77 @@ class Project(models.Model):
     @property
     def highlight_list(self):
         return [line.strip() for line in self.highlights.splitlines() if line.strip()]
+
+def validate_word_count(value):
+    total = len(value.split())
+    if total < 50:
+        raise ValidationError(f"Deskripsi minimal 50 kata, saat ini baru {total} kata.")
+    if total > 150:
+        raise ValidationError(f"Deskripsi maksimal 150 kata, saat ini sudah {total} kata.")
+
+
+class JourneyStage(models.Model):
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    school = models.CharField(max_length=150)
+    start_year = models.PositiveIntegerField()
+    end_year = models.PositiveIntegerField(null=True, blank=True)
+    photo = models.CharField(max_length=200, blank=True)
+    logo = models.CharField(max_length=200, blank=True)
+    tags = models.CharField(max_length=120, blank=True)
+    description = models.TextField(validators=[validate_word_count])
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "start_year"]
+
+    def __str__(self):
+        return f"{self.name} ({self.school})"
+
+    @property
+    def tag_list(self):
+        return [tag.strip() for tag in self.tags.split(",") if tag.strip()]
+
+    @property
+    def period(self):
+        if self.end_year:
+            return f"{self.start_year} sampai {self.end_year}"
+        return f"{self.start_year} until now"
+
+
+class StageActivity(models.Model):
+
+    class Category(models.TextChoices):
+        OLIMPIADE = "olimpiade", "Olimpiade"
+        ORGANISASI = "organisasi", "Organisasi"
+        LAINNYA = "lainnya", "Lainnya"
+
+    # Ini adalah yang akan menjadi konektor antara Activity dan juga Education kita
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    stage = models.ForeignKey(
+        JourneyStage,
+        on_delete=models.CASCADE,
+        related_name="activities",
+    )
+
+    title = models.CharField(max_length=150)
+    role = models.CharField(max_length=120, blank=True)
+    category = models.CharField(
+        max_length=20,
+        choices=Category.choices,
+        default=Category.LAINNYA,
+    )
+    description = models.TextField()
+    order = models.PositiveIntegerField(default=0)
+
+    @property
+    def point_list(self):
+        return [line.strip() for line in self.description.splitlines() if line.strip()]
+
+    class Meta:
+        ordering = ["order", "title"]
+        verbose_name_plural = "Stage activities"
+
+    def __str__(self):
+        return f"{self.title} ({self.stage.name})"
