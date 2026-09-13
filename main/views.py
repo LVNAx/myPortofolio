@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Person, Post, Mahasiswa, Experience, Project
+from .models import Person, Post, Mahasiswa, Experience, Project, JourneyStage
 
 PROFILE = {
     "name": "Nugraha",
@@ -10,6 +10,7 @@ PROFILE = {
         "and software engineering, dedicated to building impactful and intelligent solutions."
     ),
 }
+
 
 def show_main(request):
     context = {
@@ -27,9 +28,18 @@ def show_experience(request):
     }
     return render(request, "experience.html", context)
 
+
 def project_list(request):
     context = {
         **PROFILE,
         "projects": Project.objects.all(),
     }
     return render(request, "projects.html", context)
+
+
+def show_journey(request):
+    context = {
+        **PROFILE,
+        "journeys": JourneyStage.objects.prefetch_related("activities").all(),
+    }
+    return render(request, "journey.html", context)
