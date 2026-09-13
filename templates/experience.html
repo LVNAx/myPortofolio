@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ name }} Portfolio</title>
+    <title>{{ name }} - Experiences</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -24,11 +24,8 @@
             </button>
             <nav id="siteNav">
                 <a href="{% url 'main:show_main' %}">Profile</a>
-                <a href="{% url 'main:show_main' %}#about">About</a>
-                <a href="{% url 'main:show_main' %}#education">Education</a>
-                <a href="{% url 'main:show_main' %}#experience">Experience</a>
-                <a href="{% url 'main:show_main' %}#contact">Contact</a>
-                <a href="{% url 'main:show_experience' %}">Experience_T2</a>
+                <a href="{% url 'main:show_experience' %}">Experience</a>
+                <a href="{% url 'main:project_list' %}">Projects</a>
             </nav>
         </div>
     </header>
