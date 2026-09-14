@@ -47,6 +47,14 @@
     {% endwith %}
 
     <main>
+        {% if messages %}
+        <div class="container">
+            {% for message in messages %}
+            <p class="flash{% if message.tags %} flash--{{ message.tags }}{% endif %}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         {% block content %}{% endblock %}
     </main>
 

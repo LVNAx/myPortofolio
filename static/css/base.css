@@ -296,3 +296,55 @@ h1,
         transition: none;
     }
 }
+
+/* Pesan setelah aksi (tambah atau hapus proyek) */
+.flash {
+    margin-top: 1.5rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    color: var(--accent-dark);
+    font-weight: 600;
+}
+
+.flash--error {
+    background-color: #fef3f2;
+    border-color: #b42318;
+    color: #b42318;
+}
+
+/* Tombol aksi (tambah, cari, hapus) */
+.button {
+    display: inline-block;
+    border: 0;
+    border-radius: var(--radius);
+    padding: 0.65rem 1rem;
+    background-color: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.button:hover {
+    background-color: var(--accent-dark);
+}
+
+.button-secondary {
+    background-color: var(--ink);
+}
+
+.button-secondary:hover {
+    background-color: var(--accent);
+}
+
+.button-danger {
+    background-color: #b42318;
+}
+
+.button-danger:hover {
+    background-color: #912018;
+}

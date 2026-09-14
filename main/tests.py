@@ -1,11 +1,11 @@
 from datetime import date
 from django.core.exceptions import ValidationError
-
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-
+from django.test import TestCase, override_settings
 from main.models import Experience, Project, JourneyStage, StageActivity
+
 
 class MainTest(TestCase):
     def setUp(self):
@@ -122,6 +122,35 @@ class ProjectTest(TestCase):
         response = self.client.get(reverse("main:project_list"))
 
         self.assertContains(response, f'href="{reverse("main:show_main")}"')
+
+
+# Ini cuman penasaran
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_delete_rejected_with_wrong_secret(self):
+        url = reverse("main:delete_project", args=[self.project.id])
+        self.client.post(url, {"secret": "salah"})
+
+        self.assertTrue(Project.objects.filter(pk=self.project.pk).exists())
+
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_delete_with_secret_header(self):
+        url = reverse("main:delete_project", args=[self.project.id])
+        self.client.post(url, headers={"X-Portfolio-Secret": "rahasia-test"})
+
+        self.assertFalse(Project.objects.filter(pk=self.project.pk).exists())
+
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_create_rejected_without_secret(self):
+        self.client.post(reverse("main:create_project"), {
+            "title": "Proyek Palsu",
+            "role": "Penyusup",
+            "category": "web",
+            "description": "Tidak boleh tersimpan.",
+            "tech_stack": "Django",
+            "started_at": "2026-09-01",
+        })
+
+        self.assertFalse(Project.objects.filter(title="Proyek Palsu").exists())
 
 class JourneyTest(TestCase):
     def setUp(self):

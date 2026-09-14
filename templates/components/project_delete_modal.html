@@ -1,0 +1,49 @@
+<p class="experience-status">
+    <button type="button"
+            class="button button-danger"
+            popovertarget="delete-project-{{ project.id }}"
+            aria-label="Hapus {{ project.title }}"
+            title="Hapus proyek">
+        Hapus Proyek
+    </button>
+</p>
+<div id="delete-project-{{ project.id }}"
+     class="project-delete-modal"
+     popover="auto"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="delete-project-title-{{ project.id }}">
+    <button type="button"
+            class="project-delete-modal__backdrop"
+            popovertarget="delete-project-{{ project.id }}"
+            popovertargetaction="hide"
+            aria-label="Tutup konfirmasi hapus"></button>
+    <div class="project-delete-modal__content">
+        <button type="button"
+                class="project-delete-modal__close"
+                popovertarget="delete-project-{{ project.id }}"
+                popovertargetaction="hide"
+                aria-label="Tutup konfirmasi hapus">×</button>
+        <h2 id="delete-project-title-{{ project.id }}">Hapus Projek?</h2>
+        <p>
+            Apakah Anda yakin ingin menghapus
+            <strong>{{ project.title }}</strong>?
+        </p>
+        <form method="post" action="{% url 'main:delete_project' project.id %}">
+            {% csrf_token %}
+            <label for="secret-{{ project.id }}">Kode Rahasia</label>
+            <input type="password"
+                   id="secret-{{ project.id }}"
+                   name="secret"
+                   required
+                   autocomplete="current-password">
+            <div class="project-delete-modal__actions">
+                <button type="button"
+                        class="button button-secondary"
+                        popovertarget="delete-project-{{ project.id }}"
+                        popovertargetaction="hide">Batal</button>
+                <button type="submit" class="button button-danger">Ya, Hapus</button>
+            </div>
+        </form>
+    </div>
+</div>
