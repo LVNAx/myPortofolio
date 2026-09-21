@@ -174,15 +174,24 @@ Contohnya pada proyek ini, ketika saya menambahkan model `JourneyStage` dan `Sta
 | Senin, 21 September | Memperbaiki dan juga merapikan apa yang masih bermasalah (Menambahkan Edit dan Thumbnail utk Experience) |
 
 ## AI Disclosure
-> Untuk Tugas-3 ini, saya masih bisa banyak banget yang bisa diimprove lagi dan sangat banyak mengikuti Tutorial-3 dengan menambahkan filter pada Experience. 
+> Untuk Tugas-3 ini, saya masih banyak banget yang bisa diimprove lagi dan untuk saat ini sangat banyak mengikuti Tutorial-3 dengan menambahkan filter pada Experience. 
 - **[Chat 1-Model: Claude Sonnet-5 High](https://claude.ai/share/8b57bbb1-f26c-442d-9f5d-52ec80a5dd40)** digunakan untuk memahami kode, mengimprove kode, dan juga memperbaiki beberapa error
 
 ## Pertanyaan Reflektif Tugas-3
 1. Jelaskan mengapa kita menggunakan ModelForm pada Django alih-alih membuat form HTML secara manual. Selain itu, jelaskan pula mengapa kita diwajibkan menambahkan {% csrf_token %} pada form tersebut!
-Jawaban: 
+Jawaban: Kita menggunakan ModelForm karena form-nya dibuat langsung dari model, agar model tetap menjadi satu-satunya sumber aturan dari data-nya. Misal, di sini di ExperienceForm, Django secara otomatis mengubah field category yang punya choices menjadi dropdown, kemudian title menjadi input teks dengan batas panjang max_length yang sebelumnya udah kita definisikan, dan URLField mengecek format URL sendiri. Nah, klo kita pakai form HTML manual, kita harus melakukan banyak hal lagi, seperti aturan validasinya, pesan errornya, kemudian juga menulis ulang inputnya bagaimana. ModelForm sudah menyediakan banyak fungsi agar kita tidak melakukan itu lagi.
+
+Nah, kemudian {% csrf_token %} ini wajib karena browser akan otomatis mengirim cookie ke sebuah website pada setiap request, termasuk request yang dipicu dari website lain. Tanpa ini, halaman yang jahat bisa membuat browser pengguna mengirim POST ke aplikasi kita tanpa kita sadari. Pada proyek ini, form tambah, ubah, dan hapus (termasuk form yang ada di dalam modal hapus) semuanya kita pakaikan POST dan wajib membawa token.
 
 2. Pada Tutorial 03, kita membahas format data JSON dan XML. Mengapa JSON lebih disukai dalam pengembangan aplikasi web modern dibandingkan XML?
-Jawaban:
+Jawaban: JSON lebih disukai karena lebih simpel dan langsung cocok dengan JavaScript-nya. Kemudian, struktur JSON yang terdiri dari objek {}, array [], dan nilai-nilai seperti string, integer, boolean, dst tanpa tag pembuka dan penutup seperti XML yang membuat ukurannya menjadi lebih ringan, cepat dikirim, dan cepat dibaca pula. Nah, selain itu juga, setau saya JSON ini lebih populer digunakan di kalangan penggiat IT dan ini juga udah menjadi kebiasaan (Karena aplikasi web modern umumnya memakai JavaScript di sisi klien dan berkomunikasi lewat API, JSON menjadi pilihan bawaan). Nah, XML juga tetap punya kelebihan, seperti atribut, namespace, dan validasi skema yang ketat, sehingga masih dipakai untuk dokumen dan sistem lama seperti RSS atau SOAP.
 
 3. Jelaskan alur yang terjadi saat kamu menggunakan fungsi view untuk mengembalikan data portofoliomu dalam bentuk JSON. Mengapa kita perlu melakukan proses serialization pada model Django sebelum datanya dikembalikan?
-Jawaban: 
+Jawaban: Kira-kira alurnya begini:
+Contoh: `/api/experience/?category=volunteer&sort=oldest`
+   1. Request akan masuk ke `portofolio/urls.py`, diteruskan ke `main/urls.py` lewat include, lalu cocok dengan `path("api/experience/", get_experience_json)`.
+   2. View `get_experience_json` mengambil data `Experience` dari database, difilter sesuai `category` dan diurutkan sesuai sort.
+   3. Data itu diubah menjadi teks JSON dengan  `serializers.serialize("json", ...)`, lalu dikirim ke browser lewat `HttpResponse` dengan `content_type="application/json"` agar browser tahu isinya JSON.
+   4. Halaman `/experience/` memakai fungsi yang sama: `show_experience` mengambil JSON itu, mengubahnya kembali menjadi objek dengan `deserialize`, lalu menampilkannya lewat template.
+
+   Serialization perlu dilakukan karena data dari database masih berupa objek Python, sedangkan yang bisa dikirim lewat internet hanya teks. Dengan diubah menjadi JSON, data bisa dibaca oleh browser atau aplikasi lain yang tidak mengerti Python.
