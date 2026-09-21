@@ -147,7 +147,23 @@
     padding: 0.4rem 0.9rem;
 }
 
-/* Modal konfirmasi hapus */
+@media (max-width: 600px) {
+    .project-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .project-add-button {
+        justify-content: center;
+    }
+
+    .project-search {
+        flex-direction: column;
+    }
+}
+
+/* Pindahkan ke base.css aja deh */
+/* 
 .project-delete-modal {
     display: none;
     position: fixed;
@@ -268,4 +284,4 @@
 
 .project-delete-modal__content input:focus {
     outline: 2px solid var(--accent);
-}
+} */

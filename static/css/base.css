@@ -348,3 +348,114 @@ h1,
 .button-danger:hover {
     background-color: #912018;
 }
+
+/* Modal Konfirmasi Hapus */
+/* Modal konfirmasi hapus (dipakai Projects dan Experience) */
+.delete-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 1rem;
+    border: 0;
+    background: transparent;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-modal:popover-open {
+    display: flex;
+}
+
+.delete-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    padding: 0;
+    background: rgba(28, 25, 23, 0.58);
+    cursor: default;
+}
+
+.delete-modal__content {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 480px);
+    padding: 1.5rem;
+    background-color: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    box-shadow: 0 1rem 3rem rgba(28, 25, 23, 0.22);
+}
+
+.delete-modal__content h2 {
+    margin-bottom: 0.75rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+}
+
+.delete-modal__content label {
+    display: block;
+    margin: 1rem 0 0.4rem;
+    font-weight: 700;
+}
+
+.delete-modal__content input {
+    width: 100%;
+    padding: 0.7rem;
+    background-color: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    font: inherit;
+}
+
+.delete-modal__content input:focus {
+    outline: 2px solid var(--accent);
+}
+
+.delete-modal__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.delete-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 600px) {
+    .delete-modal {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .delete-modal__content {
+        width: 100%;
+        padding: 1.25rem;
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+
+    .delete-modal__actions {
+        flex-direction: column-reverse;
+    }
+
+    .delete-modal__actions .button {
+        width: 100%;
+        text-align: center;
+    }
+}

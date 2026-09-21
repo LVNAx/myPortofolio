@@ -79,7 +79,9 @@
                             {% if project.github_url %}
                             <a href="{{ project.github_url }}" class="btn" target="_blank" rel="noopener">GitHub</a>
                             {% endif %}
-                            {% include "components/project_delete_modal.html" %}
+                            {% url 'main:delete_project' project.id as delete_url %}
+                            {% include "components/delete_modal.html" with modal_id=project.id item_label="Proyek" item_title=project.title delete_url=delete_url %}
+                            
                         </div>
                     </div>
                 </div>
