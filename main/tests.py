@@ -1,11 +1,13 @@
 from datetime import date
 from django.core.exceptions import ValidationError
-
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-
+from django.test import TestCase, override_settings
 from main.models import Experience, Project, JourneyStage, StageActivity
+import json
+from datetime import date, timedelta
+
 
 class MainTest(TestCase):
     def setUp(self):
@@ -123,6 +125,35 @@ class ProjectTest(TestCase):
 
         self.assertContains(response, f'href="{reverse("main:show_main")}"')
 
+
+# Ini cuman penasaran
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_delete_rejected_with_wrong_secret(self):
+        url = reverse("main:delete_project", args=[self.project.id])
+        self.client.post(url, {"secret": "salah"})
+
+        self.assertTrue(Project.objects.filter(pk=self.project.pk).exists())
+
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_delete_with_secret_header(self):
+        url = reverse("main:delete_project", args=[self.project.id])
+        self.client.post(url, headers={"X-Portfolio-Secret": "rahasia-test"})
+
+        self.assertFalse(Project.objects.filter(pk=self.project.pk).exists())
+
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_create_rejected_without_secret(self):
+        self.client.post(reverse("main:create_project"), {
+            "title": "Proyek Palsu",
+            "role": "Penyusup",
+            "category": "web",
+            "description": "Tidak boleh tersimpan.",
+            "tech_stack": "Django",
+            "started_at": "2026-09-01",
+        })
+
+        self.assertFalse(Project.objects.filter(title="Proyek Palsu").exists())
+
 class JourneyTest(TestCase):
     def setUp(self):
         self.stage = JourneyStage.objects.create(
@@ -189,3 +220,164 @@ class JourneyTest(TestCase):
 
         with self.assertRaises(ValidationError):
             self.stage.full_clean()
+
+class ExperienceFeatureTest(TestCase):
+    def setUp(self):
+        now = timezone.now()
+        Experience.objects.create(
+            title="Magang Data", description="Analisis data.",
+            category="internship", started_at=now - timedelta(days=200),
+        )
+        Experience.objects.create(
+            title="Asisten Dosen", description="Mengajar.",
+            category="part-time", started_at=now - timedelta(days=100),
+        )
+        Experience.objects.create(
+            title="Staff Multimedia", description="Membangun web.",
+            category="volunteer", started_at=now - timedelta(days=10),
+        )
+
+    def titles(self, response):
+        return [item.title for item in response.context["experience_list"]]
+
+    def test_default_sort_is_newest_first(self):
+        response = self.client.get(reverse("main:show_experience"))
+
+        self.assertEqual(
+            self.titles(response),
+            ["Staff Multimedia", "Asisten Dosen", "Magang Data"],
+        )
+
+    def test_sort_oldest_first(self):
+        response = self.client.get(reverse("main:show_experience"), {"sort": "oldest"})
+
+        self.assertEqual(
+            self.titles(response),
+            ["Magang Data", "Asisten Dosen", "Staff Multimedia"],
+        )
+        self.assertEqual(response.context["selected_sort"], "oldest")
+
+    def test_invalid_sort_falls_back_to_newest(self):
+        response = self.client.get(reverse("main:show_experience"), {"sort": "asal"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["selected_sort"], "newest")
+        self.assertEqual(self.titles(response)[0], "Staff Multimedia")
+
+    def test_filter_by_category(self):
+        response = self.client.get(reverse("main:show_experience"), {"category": "part-time"})
+
+        self.assertEqual(self.titles(response), ["Asisten Dosen"])
+        self.assertEqual(response.context["selected_category"], "part-time")
+
+    def test_invalid_category_shows_all(self):
+        response = self.client.get(reverse("main:show_experience"), {"category": "ngawur"})
+
+        self.assertEqual(len(self.titles(response)), 3)
+        self.assertEqual(response.context["selected_category"], "")
+
+    def test_filter_without_result_shows_message(self):
+        response = self.client.get(reverse("main:show_experience"), {"category": "research"})
+
+        self.assertContains(response, "Tidak ada pengalaman pada kategori ini.")
+
+    def test_json_endpoint(self):
+        response = self.client.get(
+            reverse("main:get_experience_json"), {"sort": "oldest", "category": "internship"}
+        )
+        data = json.loads(response.content)
+
+        self.assertEqual(response["Content-Type"], "application/json")
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["fields"]["title"], "Magang Data")
+
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_create_experience_with_secret(self):
+        response = self.client.post(reverse("main:create_experience"), {
+            "title": "Pengalaman Baru", "category": "freelance",
+            "description": "Membuat web.", "started_at": "2026-01-01",
+            "ended_at": "", "secret": "rahasia-test",
+        })
+
+        self.assertRedirects(response, reverse("main:show_experience"))
+        self.assertTrue(Experience.objects.filter(title="Pengalaman Baru").exists())
+
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_create_experience_rejected_with_wrong_secret(self):
+        response = self.client.post(reverse("main:create_experience"), {
+            "title": "Tidak Boleh Masuk", "category": "freelance",
+            "description": "Membuat web.", "started_at": "2026-01-01",
+            "ended_at": "", "secret": "salah",
+        })
+
+        self.assertContains(response, "Kode rahasia salah.")
+        self.assertFalse(Experience.objects.filter(title="Tidak Boleh Masuk").exists())
+
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_delete_experience_with_secret(self):
+        target = Experience.objects.get(title="Magang Data")
+        self.client.post(
+            reverse("main:delete_experience", args=[target.id]),
+            {"secret": "rahasia-test"},
+        )
+
+        self.assertFalse(Experience.objects.filter(pk=target.pk).exists())
+
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_delete_experience_rejected_with_wrong_secret(self):
+        target = Experience.objects.get(title="Magang Data")
+        self.client.post(
+            reverse("main:delete_experience", args=[target.id]),
+            {"secret": "salah"},
+        )
+
+        self.assertTrue(Experience.objects.filter(pk=target.pk).exists())
+
+    def test_edit_page_is_prefilled(self):
+        target = Experience.objects.get(title="Magang Data")
+        response = self.client.get(reverse("main:edit_experience", args=[target.id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "experience_form.html")
+        self.assertContains(response, "Magang Data")
+        self.assertContains(response, "Ubah Pengalaman")
+
+    def test_edit_page_unknown_id_returns_404(self):
+        response = self.client.get(
+            reverse("main:edit_experience", args=["00000000-0000-0000-0000-000000000000"])
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_experience_card_links_to_edit(self):
+        target = Experience.objects.get(title="Magang Data")
+        response = self.client.get(reverse("main:show_experience"))
+
+        self.assertContains(response, reverse("main:edit_experience", args=[target.id]))
+
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_edit_experience_with_secret(self):
+        target = Experience.objects.get(title="Magang Data")
+        response = self.client.post(reverse("main:edit_experience", args=[target.id]), {
+            "title": "Magang Data (Diperbarui)", "category": "internship",
+            "description": "Analisis data.", "started_at": "2026-02-01",
+            "ended_at": "", "secret": "rahasia-test",
+        })
+        target.refresh_from_db()
+
+        self.assertRedirects(response, reverse("main:show_experience"))
+        self.assertEqual(target.title, "Magang Data (Diperbarui)")
+        self.assertEqual(Experience.objects.count(), 3)
+
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_edit_experience_rejected_with_wrong_secret(self):
+        target = Experience.objects.get(title="Magang Data")
+        response = self.client.post(reverse("main:edit_experience", args=[target.id]), {
+            "title": "Judul Curang", "category": "internship",
+            "description": "Analisis data.", "started_at": "2026-02-01",
+            "ended_at": "", "secret": "salah",
+        })
+        target.refresh_from_db()
+
+        self.assertContains(response, "Kode rahasia salah.")
+        self.assertEqual(target.title, "Magang Data")

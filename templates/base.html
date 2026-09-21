@@ -38,7 +38,7 @@
                 <a href="{% url 'main:show_journey' %}"
                    {% if current == 'show_journey' %}aria-current="page"{% endif %}>Journey</a>
                 <a href="{% url 'main:show_experience' %}"
-                   {% if current == 'show_experience' %}aria-current="page"{% endif %}>Experience</a>
+                   {% if current == 'show_experience' or current == 'create_experience' or current == 'edit_experience' %}aria-current="page"{% endif %}>Experience</a>
                 <a href="{% url 'main:project_list' %}"
                    {% if current == 'project_list' %}aria-current="page"{% endif %}>Projects</a>
             </nav>
@@ -47,6 +47,14 @@
     {% endwith %}
 
     <main>
+        {% if messages %}
+        <div class="container">
+            {% for message in messages %}
+            <p class="flash{% if message.tags %} flash--{{ message.tags }}{% endif %}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         {% block content %}{% endblock %}
     </main>
 

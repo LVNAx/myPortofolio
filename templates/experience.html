@@ -11,10 +11,36 @@
 <section class="page-section">
     <div class="container">
 
-        <header class="page-header">
-            <p class="kicker">Perjalanan saya sejauh ini</p>
-            <h1 class="page-title">Experience</h1>
+        <header class="page-header experience-header">
+            <div>
+                <p class="kicker">Perjalanan saya sejauh ini</p>
+                <h1 class="page-title">Experience</h1>
+            </div>
+            <a href="{% url 'main:create_experience' %}" class="button experience-add-button">
+                <span aria-hidden="true">+</span>
+                Tambah Pengalaman
+            </a>
         </header>
+
+        <form method="get" action="{% url 'main:show_experience' %}" class="experience-filter">
+            <div class="experience-filter__field">
+                <label for="filter-category">Kategori</label>
+                <select id="filter-category" name="category">
+                    <option value="">Semua kategori</option>
+                    {% for value, label in category_choices %}
+                    <option value="{{ value }}"{% if value == selected_category %} selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="experience-filter__field">
+                <label for="filter-sort">Urutkan</label>
+                <select id="filter-sort" name="sort">
+                    <option value="newest"{% if selected_sort == "newest" %} selected{% endif %}>Terbaru</option>
+                    <option value="oldest"{% if selected_sort == "oldest" %} selected{% endif %}>Terlama</option>
+                </select>
+            </div>
+            <button type="submit" class="button">Terapkan</button>
+        </form>
 
         {% if experience_list %}
         <div class="experience-grid">
@@ -22,13 +48,28 @@
             <article class="card experience-card">
                 <p class="experience-category">{{ experience.get_category_display }}</p>
                 <h2 class="experience-title">{{ experience.title }}</h2>
-                <p class="experience-description">{{ experience.description }}</p>
-                <p class="experience-status{% if experience.is_ongoing %} experience-status--ongoing{% endif %}">
-                    {% if experience.is_ongoing %}Sedang berlangsung{% else %}Selesai{% endif %}
+                <p class="experience-period">
+                    {{ experience.started_at|date:"M Y" }} &ndash;
+                    {% if experience.ended_at %}{{ experience.ended_at|date:"M Y" }}{% else %}Sekarang{% endif %}
                 </p>
+                <p class="experience-description">{{ experience.description }}</p>
+
+                <div class="experience-footer">
+                    <span class="experience-status{% if experience.is_ongoing %} experience-status--ongoing{% endif %}">
+                        {% if experience.is_ongoing %}Sedang berlangsung{% else %}Selesai{% endif %}
+                    </span>
+                    <div class="experience-actions">
+                        <a href="{% url 'main:edit_experience' experience.id %}" class="button button-secondary">Ubah</a>
+                        {% url 'main:delete_experience' experience.id as delete_url %}
+                        {% include "components/delete_modal.html" with modal_id=experience.id item_label="Pengalaman" item_title=experience.title delete_url=delete_url %}
+                    </div>
+                </div>
+                
             </article>
             {% endfor %}
         </div>
+        {% elif selected_category %}
+        <p class="empty-state">Tidak ada pengalaman pada kategori ini.</p>
         {% else %}
         <p class="empty-state">Belum ada pengalaman yang ditambahkan.</p>
         {% endif %}

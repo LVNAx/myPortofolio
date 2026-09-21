@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Add Project{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+
+        <header class="page-header">
+            <p class="kicker">Projects</p>
+            <h1 class="page-title">Add New Project</h1>
+        </header>
+
+        <form method="post" action="{% url 'main:create_project' %}" class="project-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}
+                <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="button">Tambah Project</button>
+                <a href="{% url 'main:project_list' %}" class="button button-secondary">Batal</a>
+            </div>
+        </form>
+
+    </div>
+</section>
+{% endblock %}

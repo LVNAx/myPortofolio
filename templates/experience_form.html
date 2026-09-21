@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if is_edit %}Edit{% else %}Add{% endif %} Experience{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+
+        <header class="page-header">
+            <p class="kicker">Experience</p>
+            <h1 class="page-title">{% if is_edit %}Ubah Pengalaman{% else %}Tambah Pengalaman{% endif %}</h1>
+        </header>
+
+        <form method="post" class="project-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}
+                <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="button">{% if is_edit %}Simpan Perubahan{% else %}Tambah Pengalaman{% endif %}</button>
+                <a href="{% url 'main:show_experience' %}" class="button button-secondary">Batal</a>
+            </div>
+        </form>
+
+    </div>
+</section>
+{% endblock %}

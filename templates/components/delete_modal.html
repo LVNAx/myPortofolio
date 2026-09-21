@@ -1,0 +1,49 @@
+{# Di sini kita satuin aja dengan yang project #}
+
+<button type="button"
+        class="button button-danger"
+        popovertarget="delete-{{ modal_id }}"
+        aria-label="Hapus {{ item_title }}"
+        title="Hapus {{ item_label|lower }}">
+    Hapus {{ item_label }}
+</button>
+<div id="delete-{{ modal_id }}"
+     class="delete-modal"
+     popover="auto"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="delete-title-{{ modal_id }}">
+    <button type="button"
+            class="delete-modal__backdrop"
+            popovertarget="delete-{{ modal_id }}"
+            popovertargetaction="hide"
+            aria-label="Tutup konfirmasi hapus"></button>
+    <div class="delete-modal__content">
+        <button type="button"
+                class="delete-modal__close"
+                popovertarget="delete-{{ modal_id }}"
+                popovertargetaction="hide"
+                aria-label="Tutup konfirmasi hapus">×</button>
+        <h2 id="delete-title-{{ modal_id }}">Hapus {{ item_label|lower }}?</h2>
+        <p>
+            Apakah Anda yakin ingin menghapus
+            <strong>{{ item_title }}</strong>?
+        </p>
+        <form method="post" action="{{ delete_url }}">
+            {% csrf_token %}
+            <label for="secret-{{ modal_id }}">Kode Rahasia</label>
+            <input type="password"
+                   id="secret-{{ modal_id }}"
+                   name="secret"
+                   required
+                   autocomplete="current-password">
+            <div class="delete-modal__actions">
+                <button type="button"
+                        class="button button-secondary"
+                        popovertarget="delete-{{ modal_id }}"
+                        popovertargetaction="hide">Batal</button>
+                <button type="submit" class="button button-danger">Ya, Hapus</button>
+            </div>
+        </form>
+    </div>
+</div>

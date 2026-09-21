@@ -31,8 +31,10 @@ SECRET_KEY = 'django-insecure-6$@raade!_-a*ijka&q2hk*=9+@z$bqnfx5xeb9g8hhmk&$f5g
 DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "nugraha-kautsarrizqi-myportofolio.pws.cs.ui.ac.id"]
+CSRF_TRUSTED_ORIGINS = ["https://nugraha-kautsarrizqi-myportofolio.pws.cs.ui.ac.id"] # Menambahkan url yang dapat melakukan request ke server
 
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
+PORTFOLIO_SECRET = os.getenv("PORTFOLIO_SECRET", "") # Mengantisipasi ada yang mengedit
 
 # Application definition
 
@@ -64,7 +66,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
+        'APP_DIRS': True, # True agar django app diprioritaskan
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',

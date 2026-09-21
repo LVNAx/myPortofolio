@@ -11,10 +11,26 @@
 <section class="page-section">
     <div class="container">
 
-        <header class="page-header">
-            <p class="kicker">Things I've built</p>
-            <h1 class="page-title">Projects</h1>
+        <header class="page-header project-header">
+            <div>
+                <p class="kicker">Things I've built</p>
+                <h1 class="page-title">Projects</h1>
+            </div>
+            <a href="{% url 'main:create_project' %}" class="button project-add-button">
+                <span aria-hidden="true">+</span>
+                Add Project
+            </a>
         </header>
+
+        <form method="get" action="{% url 'main:project_list' %}" class="project-search" role="search">
+            <input type="search"
+                   name="title"
+                   value="{{ title_query }}"
+                   placeholder="Search by project name"
+                   class="project-search__input"
+                   aria-label="Search by project name">
+            <button type="submit" class="button">Search</button>
+        </form>
 
         {% if projects %}
         <div class="project-grid">
@@ -63,6 +79,9 @@
                             {% if project.github_url %}
                             <a href="{{ project.github_url }}" class="btn" target="_blank" rel="noopener">GitHub</a>
                             {% endif %}
+                            {% url 'main:delete_project' project.id as delete_url %}
+                            {% include "components/delete_modal.html" with modal_id=project.id item_label="Proyek" item_title=project.title delete_url=delete_url %}
+                            
                         </div>
                     </div>
                 </div>
@@ -70,6 +89,8 @@
             </article>
             {% endfor %}
         </div>
+        {% elif title_query %}
+        <p class="empty-state">No projects match "{{ title_query }}".</p>
         {% else %}
         <p class="empty-state">No projects added yet.</p>
         {% endif %}
