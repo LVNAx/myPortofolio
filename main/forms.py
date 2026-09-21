@@ -1,5 +1,5 @@
 from django.forms import DateInput, ModelForm, Textarea, TextInput, URLInput
-from main.models import Project
+from main.models import Project, Experience
 from django import forms
 
 
@@ -49,3 +49,31 @@ class ProjectForm(ModelForm):
             "started_at": DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
             "ended_at": DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
         }
+
+class ExperienceForm(ModelForm):
+    secret = forms.CharField(
+        label="Kode Rahasia",
+        required=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "current_password"}),
+    )
+
+    class Meta:
+        model = Experience
+        fields = ["title", "category", "description", "started_at", "ended_at"]
+
+        labels = {
+            "title": "Judul Pengalaman",
+            "category": "Kategori",
+            "description": "Deskripsi",
+            "started_at": "Tanggal Mulai",
+            "ended_at": "Tanggal Selesai",
+        }
+
+        widgets = {
+            "title": TextInput(attrs={"placeholder": "Teaching Assistant"}),
+            "description": Textarea(attrs={"placeholder": "Ceritakan apa yang sudah kamu lakukan", "rows": 3}),
+            "started_at": DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
+            "ended_at": DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
+        }
+
+        

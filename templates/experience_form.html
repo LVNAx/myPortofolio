@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Add Experience{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+
+        <header class="page-header">
+            <p class="kicker">Experience</p>
+            <h1 class="page-title">Tambah Pengalaman</h1>
+        </header>
+
+        <form method="post" action="{% url 'main:create_experience' %}" class="project-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}
+                <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="button">Tambah Pengalaman</button>
+                <a href="{% url 'main:show_experience' %}" class="button button-secondary">Batal</a>
+            </div>
+        </form>
+
+    </div>
+</section>
+{% endblock %}
