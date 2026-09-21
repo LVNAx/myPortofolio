@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Add Experience{% endblock %}
+{% block title %}{% if is_edit %}Edit{% else %}Add{% endif %} Experience{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/form.css' %}">
@@ -13,10 +13,10 @@
 
         <header class="page-header">
             <p class="kicker">Experience</p>
-            <h1 class="page-title">Tambah Pengalaman</h1>
+            <h1 class="page-title">{% if is_edit %}Ubah Pengalaman{% else %}Tambah Pengalaman{% endif %}</h1>
         </header>
 
-        <form method="post" action="{% url 'main:create_experience' %}" class="project-form">
+        <form method="post" class="project-form">
             {% csrf_token %}
             {{ form.non_field_errors }}
 
@@ -31,7 +31,7 @@
             {% endfor %}
 
             <div class="form-actions">
-                <button type="submit" class="button">Tambah Pengalaman</button>
+                <button type="submit" class="button">{% if is_edit %}Simpan Perubahan{% else %}Tambah Pengalaman{% endif %}</button>
                 <a href="{% url 'main:show_experience' %}" class="button button-secondary">Batal</a>
             </div>
         </form>

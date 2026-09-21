@@ -58,9 +58,13 @@
                     <span class="experience-status{% if experience.is_ongoing %} experience-status--ongoing{% endif %}">
                         {% if experience.is_ongoing %}Sedang berlangsung{% else %}Selesai{% endif %}
                     </span>
-                    {% url 'main:delete_experience' experience.id as delete_url %}
-                    {% include "components/delete_modal.html" with modal_id=experience.id item_label="Pengalaman" item_title=experience.title delete_url=delete_url %}
+                    <div class="experience-actions">
+                        <a href="{% url 'main:edit_experience' experience.id %}" class="button button-secondary">Ubah</a>
+                        {% url 'main:delete_experience' experience.id as delete_url %}
+                        {% include "components/delete_modal.html" with modal_id=experience.id item_label="Pengalaman" item_title=experience.title delete_url=delete_url %}
+                    </div>
                 </div>
+                
             </article>
             {% endfor %}
         </div>

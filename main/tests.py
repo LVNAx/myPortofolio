@@ -332,3 +332,52 @@ class ExperienceFeatureTest(TestCase):
         )
 
         self.assertTrue(Experience.objects.filter(pk=target.pk).exists())
+
+    def test_edit_page_is_prefilled(self):
+        target = Experience.objects.get(title="Magang Data")
+        response = self.client.get(reverse("main:edit_experience", args=[target.id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "experience_form.html")
+        self.assertContains(response, "Magang Data")
+        self.assertContains(response, "Ubah Pengalaman")
+
+    def test_edit_page_unknown_id_returns_404(self):
+        response = self.client.get(
+            reverse("main:edit_experience", args=["00000000-0000-0000-0000-000000000000"])
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_experience_card_links_to_edit(self):
+        target = Experience.objects.get(title="Magang Data")
+        response = self.client.get(reverse("main:show_experience"))
+
+        self.assertContains(response, reverse("main:edit_experience", args=[target.id]))
+
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_edit_experience_with_secret(self):
+        target = Experience.objects.get(title="Magang Data")
+        response = self.client.post(reverse("main:edit_experience", args=[target.id]), {
+            "title": "Magang Data (Diperbarui)", "category": "internship",
+            "description": "Analisis data.", "started_at": "2026-02-01",
+            "ended_at": "", "secret": "rahasia-test",
+        })
+        target.refresh_from_db()
+
+        self.assertRedirects(response, reverse("main:show_experience"))
+        self.assertEqual(target.title, "Magang Data (Diperbarui)")
+        self.assertEqual(Experience.objects.count(), 3)
+
+    @override_settings(PORTFOLIO_SECRET="rahasia-test")
+    def test_edit_experience_rejected_with_wrong_secret(self):
+        target = Experience.objects.get(title="Magang Data")
+        response = self.client.post(reverse("main:edit_experience", args=[target.id]), {
+            "title": "Judul Curang", "category": "internship",
+            "description": "Analisis data.", "started_at": "2026-02-01",
+            "ended_at": "", "secret": "salah",
+        })
+        target.refresh_from_db()
+
+        self.assertContains(response, "Kode rahasia salah.")
+        self.assertEqual(target.title, "Magang Data")

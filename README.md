@@ -159,3 +159,30 @@ Kemudian yang terakhir, di admin/ kita juga bisa mengurutkan, memfilter, atau me
 Jawaban: Selama tugas 2 ini, saya sadar kalo perbedaan antara keduanya adalah `makemigrations` adalah tahap 'membuat rencana', sedangkan `migrate` adalah tahap 'mengeksekusinya'. `makemigrations` akan membandingkan isi `models.py` dengan migrasi sebelumnya, lalu menuliskan perubahannya ke berkas migrasi baru yang ada di folder `migrations/`, *tanpa mengubah database kita sama sekali*. Berkas inilah yang akan dimasukkan ke github juga agar semua orang dan server memiliki rencana perubahan yang sama. `migrate` kemudian membaca rencana yang belum dijalankan, lalu **benar-benar menerapkannya ke database**, seperti membuat tabel atau menambah kolom.
 
 Contohnya pada proyek ini, ketika saya menambahkan model `JourneyStage` dan `StageActivity`, `makemigrations` menghasilkan berkas `0005_journeystage_stageactivity.py`, lalu `migrate` membuat tabel `journeystage` dan `stageactivity` di database. Nah, Kedua perintah ini hanya diperlukan jika struktur tabel-nya berubah menambah `@property` seperti `tag_list` ngga memerlukan migrasi karena ngga ada kolom yang berubah.
+
+# Tugas-3
+## Progress Mingguan
+| Hari / Tanggal | Progress |
+|---|---|
+| Senin, 14 September | Menyelesaikan Tutorial-3 dan Memahami kode dan juga alur untuk membuat form-nya bagaimana |
+| Selasa, 15 September | - |
+| Rabu, 16 September | - |
+| Kamis, 17 September | - |
+| Jumat, 18 September | - |
+| Sabtu, 19 September | Mereview kembali Tutorial-3 kita sudah belajar apa aja dan menyusun rencana untuk Tugas-3 |
+| Minggu, 20 September | Menyelesaikan experience dengan menambahkan form (Create dan Delete) dan juga filter Experience |
+| Senin, 21 September | Memperbaiki dan juga merapikan apa yang masih bermasalah (Menambahkan Edit dan Thumbnail utk Experience) |
+
+## AI Disclosure
+> Untuk Tugas-3 ini, saya masih bisa banyak banget yang bisa diimprove lagi dan sangat banyak mengikuti Tutorial-3 dengan menambahkan filter pada Experience. 
+- **[Chat 1-Model: Claude Sonnet-5 High](https://claude.ai/share/8b57bbb1-f26c-442d-9f5d-52ec80a5dd40)** digunakan untuk memahami kode, mengimprove kode, dan juga memperbaiki beberapa error
+
+## Pertanyaan Reflektif Tugas-3
+1. Jelaskan mengapa kita menggunakan ModelForm pada Django alih-alih membuat form HTML secara manual. Selain itu, jelaskan pula mengapa kita diwajibkan menambahkan {% csrf_token %} pada form tersebut!
+Jawaban: 
+
+2. Pada Tutorial 03, kita membahas format data JSON dan XML. Mengapa JSON lebih disukai dalam pengembangan aplikasi web modern dibandingkan XML?
+Jawaban:
+
+3. Jelaskan alur yang terjadi saat kamu menggunakan fungsi view untuk mengembalikan data portofoliomu dalam bentuk JSON. Mengapa kita perlu melakukan proses serialization pada model Django sebelum datanya dikembalikan?
+Jawaban: 

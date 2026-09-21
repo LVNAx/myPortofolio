@@ -184,3 +184,22 @@ def delete_experience(request, experience_id):
             messages.error(request, "Kode rahasia salah. Pengalaman tidak dihapus.")
 
     return redirect("main:show_experience")
+
+def edit_experience(request, experience_id):
+    experience = get_object_or_404(Experience, pk=experience_id)
+    form = ExperienceForm(request.POST or None, instance=experience)  # instance = data lama yang diedit
+
+    if request.method == "POST" and form.is_valid():
+        if is_owner(request, form.cleaned_data.get("secret", "")):
+            form.save()
+            messages.success(request, "Pengalaman berhasil diperbarui!")
+            return redirect("main:show_experience")
+
+        form.add_error("secret", "Kode rahasia salah.")
+
+    context = {
+        **PROFILE,
+        "form": form,
+        "is_edit": True,
+    }
+    return render(request, "experience_form.html", context)

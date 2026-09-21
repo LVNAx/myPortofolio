@@ -54,12 +54,12 @@ class ExperienceForm(ModelForm):
     secret = forms.CharField(
         label="Kode Rahasia",
         required=False,
-        widget=forms.PasswordInput(attrs={"autocomplete": "current_password"}),
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
     )
 
     class Meta:
         model = Experience
-        fields = ["title", "category", "description", "started_at", "ended_at"]
+        fields = ["title", "category", "description", "thumbnail", "started_at", "ended_at"]
 
         labels = {
             "title": "Judul Pengalaman",
@@ -74,6 +74,7 @@ class ExperienceForm(ModelForm):
             "description": Textarea(attrs={"placeholder": "Ceritakan apa yang sudah kamu lakukan", "rows": 3}),
             "started_at": DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
             "ended_at": DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
+            "thumbnail": URLInput(attrs={"placeholder": "https://drive.google.com"}),
         }
 
         
