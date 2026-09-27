@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 class Person(models.Model):
     display_name = models.CharField(max_length=30)
@@ -76,6 +77,9 @@ class Project(models.Model):
     started_at = models.DateField()
     ended_at = models.DateField(blank=True, null=True)
     order = models.PositiveIntegerField(default=0)
+    starred_by = models.ManyToManyField(
+        User, related_name="starred_projects", blank = True
+    )
 
     class Meta:
         ordering = ["order", "-started_at"]
@@ -132,9 +136,7 @@ class JourneyStage(models.Model):
             return f"{self.start_year} sampai {self.end_year}"
         return f"{self.start_year} until now"
 
-
 class StageActivity(models.Model):
-
     class Category(models.TextChoices):
         OLIMPIADE = "olimpiade", "Olimpiade"
         ORGANISASI = "organisasi", "Organisasi"
@@ -142,6 +144,7 @@ class StageActivity(models.Model):
 
     # Ini adalah yang akan menjadi konektor antara Activity dan juga Education kita
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid64, editable=False)
     stage = models.ForeignKey(
         JourneyStage,
         on_delete=models.CASCADE,

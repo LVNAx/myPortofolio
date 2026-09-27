@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.test import TestCase, override_settings
 from main.models import Experience, Project, JourneyStage, StageActivity
 import json
+from django.contrib.auth.models import User
 from datetime import date, timedelta
 
 
@@ -16,6 +17,8 @@ class MainTest(TestCase):
             description="Membantu mahasiswa memahami pengembangan web.",
             category="part-time",
         )
+        self.admin = User.objects.create_superuser("admin", password="RahasiaAdmin123!")
+        self.client.force_login(self.admin)
 
     def test_main_url_is_accessible(self):
         response = self.client.get(reverse("main:show_main"))
@@ -72,7 +75,9 @@ class ProjectTest(TestCase):
             live_url="https://lvnasandbox.vercel.app",
             started_at=date(2026, 6, 1),
             order=1,
-        )
+        ) 
+        self.admin = User.objects.create_superuser("admin", password="RahasiaAdmin123!")
+        self.client.force_login(self.admin)
 
     def test_project_url_is_accessible(self):
         response = self.client.get(reverse("main:project_list"))
@@ -236,6 +241,8 @@ class ExperienceFeatureTest(TestCase):
             title="Staff Multimedia", description="Membangun web.",
             category="volunteer", started_at=now - timedelta(days=10),
         )
+        self.admin = User.objects.create_superuser("admin", password="RahasiaAdmin123!")
+        self.client.force_login(self.admin)
 
     def titles(self, response):
         return [item.title for item in response.context["experience_list"]]

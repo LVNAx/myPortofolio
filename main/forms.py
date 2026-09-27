@@ -9,7 +9,6 @@ class ProjectForm(ModelForm):
         required=False,
         widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
     )
-
     class Meta:
         model = Project
         fields = [
@@ -75,6 +74,4 @@ class ExperienceForm(ModelForm):
             "started_at": DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
             "ended_at": DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
             "thumbnail": URLInput(attrs={"placeholder": "https://drive.google.com"}),
-        }
-
-        
+        }        

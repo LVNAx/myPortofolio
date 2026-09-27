@@ -16,10 +16,12 @@
                 <p class="kicker">Things I've built</p>
                 <h1 class="page-title">Projects</h1>
             </div>
+            {% if user.is_superuser %}
             <a href="{% url 'main:create_project' %}" class="button project-add-button">
                 <span aria-hidden="true">+</span>
                 Add Project
             </a>
+            {% endif %}
         </header>
 
         <form method="get" action="{% url 'main:project_list' %}" class="project-search" role="search">
@@ -80,12 +82,13 @@
                             <a href="{{ project.github_url }}" class="btn" target="_blank" rel="noopener">GitHub</a>
                             {% endif %}
                             {% url 'main:delete_project' project.id as delete_url %}
-                            {% include "components/delete_modal.html" with modal_id=project.id item_label="Proyek" item_title=project.title delete_url=delete_url %}
-                            
+                            {% include "components/project_star.html" with project=project %}
+                            {% if user.is_superuser %}
+                                {% include "components/delete_modal.html" with modal_id=project.id item_label="Proyek" item_title=project.title delete_url=delete_url %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-
             </article>
             {% endfor %}
         </div>
