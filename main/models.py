@@ -41,6 +41,7 @@ class Experience(models.Model):
     thumbnail = models.URLField(blank=True, null=True)
     started_at = models.DateTimeField(default=timezone.now)
     ended_at = models.DateTimeField(blank=True, null=True)
+    starred_by = models.ManyToManyField(User, related_name="starred_experience", blank=True)
 
     class Meta:
         ordering = ["-started_at"]
