@@ -31,12 +31,6 @@
         </p>
         <form method="post" action="{{ delete_url }}">
             {% csrf_token %}
-            <label for="secret-{{ modal_id }}">Kode Rahasia</label>
-            <input type="password"
-                   id="secret-{{ modal_id }}"
-                   name="secret"
-                   required
-                   autocomplete="current-password">
             <div class="delete-modal__actions">
                 <button type="button"
                         class="button button-secondary"

@@ -34,7 +34,6 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "nugraha-kautsarrizqi-myportofolio.pw
 CSRF_TRUSTED_ORIGINS = ["https://nugraha-kautsarrizqi-myportofolio.pws.cs.ui.ac.id"] # Menambahkan url yang dapat melakukan request ke server
 
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
-PORTFOLIO_SECRET = os.getenv("PORTFOLIO_SECRET", "") # Mengantisipasi ada yang mengedit
 
 # Application definition
 
