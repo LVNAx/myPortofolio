@@ -210,5 +210,4 @@ Contoh: `/api/experience/?category=volunteer&sort=oldest`
 | Senin, 21 September | Menyelesaikan tugas-4 dengan menerapkannya di Experience dan juga Project dengan menambahkan testing juga |
 
 ## AI Disclosure
-> Untuk Tugas-3 ini, saya masih banyak banget yang bisa diimprove lagi dan untuk saat ini sangat banyak mengikuti Tutorial-3 dengan menambahkan filter pada Experience. 
 - **[Chat 1-Model: Claude Sonnet-5 Medium](https://claude.ai/share/81e6797e-cf36-46c6-909d-bb2bef6a130e)** digunakan untuk memahami kode (mengenai Auth, Cookie, Session), mengimprove kode, dan juga memperbaiki beberapa error
