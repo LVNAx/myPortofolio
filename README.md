@@ -195,3 +195,19 @@ Contoh: `/api/experience/?category=volunteer&sort=oldest`
    4. Halaman `/experience/` memakai fungsi yang sama: `show_experience` mengambil JSON itu, mengubahnya kembali menjadi objek dengan `deserialize`, lalu menampilkannya lewat template.
 
    Serialization perlu dilakukan karena data dari database masih berupa objek Python, sedangkan yang bisa dikirim lewat internet hanya teks. Dengan diubah menjadi JSON, data bisa dibaca oleh browser atau aplikasi lain yang tidak mengerti Python.
+
+# Tugas-3
+## Progress Mingguan
+| Hari / Tanggal | Progress |
+|---|---|
+| Senin, 14 September | - |
+| Selasa, 15 September | - |
+| Rabu, 16 September | - |
+| Kamis, 17 September | - |
+| Jumat, 18 September | - |
+| Sabtu, 19 September | Menyelesaikan tutorial-4 |
+| Minggu, 20 September | Menambahkan Group Editor |
+| Senin, 21 September | Menyelesaikan tugas-4 dengan menerapkannya di Experience dan juga Project dengan menambahkan testing juga |
+
+## AI Disclosure
+- **[Chat 1-Model: Claude Sonnet-5 Medium](https://claude.ai/share/81e6797e-cf36-46c6-909d-bb2bef6a130e)** digunakan untuk memahami kode (mengenai Auth, Cookie, Session), mengimprove kode, dan juga memperbaiki beberapa error
