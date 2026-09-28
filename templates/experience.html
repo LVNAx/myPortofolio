@@ -16,10 +16,12 @@
                 <p class="kicker">Perjalanan saya sejauh ini</p>
                 <h1 class="page-title">Experience</h1>
             </div>
+            {% if user.is_superuser %}
             <a href="{% url 'main:create_experience' %}" class="button experience-add-button">
                 <span aria-hidden="true">+</span>
                 Tambah Pengalaman
             </a>
+            {% endif %}
         </header>
 
         <form method="get" action="{% url 'main:show_experience' %}" class="experience-filter">
@@ -56,12 +58,19 @@
 
                 <div class="experience-footer">
                     <span class="experience-status{% if experience.is_ongoing %} experience-status--ongoing{% endif %}">
-                        {% if experience.is_ongoing %}Sedang berlangsung{% else %}Selesai{% endif %}
+                    {% if experience.is_ongoing %}Sedang berlangsung{% else %}Selesai{% endif %}
                     </span>
                     <div class="experience-actions">
+                        {% include "components/experience_star.html" with experience=experience %}
+
+                        {% if can_edit %}
                         <a href="{% url 'main:edit_experience' experience.id %}" class="button button-secondary">Ubah</a>
+                        {% endif %}
+
+                        {% if user.is_superuser %}
                         {% url 'main:delete_experience' experience.id as delete_url %}
                         {% include "components/delete_modal.html" with modal_id=experience.id item_label="Pengalaman" item_title=experience.title delete_url=delete_url %}
+                        {% endif %}
                     </div>
                 </div>
                 

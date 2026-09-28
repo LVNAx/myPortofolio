@@ -34,7 +34,6 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "nugraha-kautsarrizqi-myportofolio.pw
 CSRF_TRUSTED_ORIGINS = ["https://nugraha-kautsarrizqi-myportofolio.pws.cs.ui.ac.id"] # Menambahkan url yang dapat melakukan request ke server
 
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
-PORTFOLIO_SECRET = os.getenv("PORTFOLIO_SECRET", "") # Mengantisipasi ada yang mengedit
 
 # Application definition
 
@@ -44,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles',   
     'main',
 ]
 
@@ -69,6 +68,7 @@ TEMPLATES = [
         'APP_DIRS': True, # True agar django app diprioritaskan
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
