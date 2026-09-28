@@ -1,13 +1,13 @@
-from datetime import date
+import json
+from datetime import date, timedelta
+
+from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from django.test import TestCase, override_settings
-from main.models import Experience, Project, JourneyStage, StageActivity
-import json
-from django.contrib.auth.models import User
-from datetime import date, timedelta
+
+from main.models import Experience, JourneyStage, Project, StageActivity
 
 
 class MainTest(TestCase):
@@ -17,8 +17,6 @@ class MainTest(TestCase):
             description="Membantu mahasiswa memahami pengembangan web.",
             category="part-time",
         )
-        self.admin = User.objects.create_superuser("admin", password="RahasiaAdmin123!")
-        self.client.force_login(self.admin)
 
     def test_main_url_is_accessible(self):
         response = self.client.get(reverse("main:show_main"))
@@ -63,6 +61,8 @@ class MainTest(TestCase):
         self.assertFalse(self.experience.is_ongoing)
         self.assertContains(response, "Selesai")
         self.assertNotContains(response, "Sedang berlangsung")
+
+
 class ProjectTest(TestCase):
     def setUp(self):
         self.project = Project.objects.create(
@@ -75,8 +75,9 @@ class ProjectTest(TestCase):
             live_url="https://lvnasandbox.vercel.app",
             started_at=date(2026, 6, 1),
             order=1,
-        ) 
-        self.admin = User.objects.create_superuser("admin", password="RahasiaAdmin123!")
+        )
+        # Tanpa password: force_login tidak butuh password, dan hashing password itu lambat
+        self.admin = User.objects.create_superuser("admin")
         self.client.force_login(self.admin)
 
     def test_project_url_is_accessible(self):
@@ -130,34 +131,21 @@ class ProjectTest(TestCase):
 
         self.assertContains(response, f'href="{reverse("main:show_main")}"')
 
-
-# Ini cuman penasaran
-    @override_settings(PORTFOLIO_SECRET="rahasia-test")
-    def test_delete_rejected_with_wrong_secret(self):
-        url = reverse("main:delete_project", args=[self.project.id])
-        self.client.post(url, {"secret": "salah"})
-
-        self.assertTrue(Project.objects.filter(pk=self.project.pk).exists())
-
-    @override_settings(PORTFOLIO_SECRET="rahasia-test")
-    def test_delete_with_secret_header(self):
-        url = reverse("main:delete_project", args=[self.project.id])
-        self.client.post(url, headers={"X-Portfolio-Secret": "rahasia-test"})
-
-        self.assertFalse(Project.objects.filter(pk=self.project.pk).exists())
-
-    @override_settings(PORTFOLIO_SECRET="rahasia-test")
-    def test_create_rejected_without_secret(self):
-        self.client.post(reverse("main:create_project"), {
-            "title": "Proyek Palsu",
-            "role": "Penyusup",
-            "category": "web",
-            "description": "Tidak boleh tersimpan.",
-            "tech_stack": "Django",
+    def test_owner_can_create_project(self):
+        response = self.client.post(reverse("main:create_project"), {
+            "title": "Proyek Baru", "role": "Dev", "category": "web",
+            "description": "Deskripsi.", "tech_stack": "Django",
             "started_at": "2026-09-01",
         })
 
-        self.assertFalse(Project.objects.filter(title="Proyek Palsu").exists())
+        self.assertRedirects(response, reverse("main:project_list"))
+        self.assertTrue(Project.objects.filter(title="Proyek Baru").exists())
+
+    def test_owner_can_delete_project(self):
+        self.client.post(reverse("main:delete_project", args=[self.project.id]))
+
+        self.assertFalse(Project.objects.filter(pk=self.project.pk).exists())
+
 
 class JourneyTest(TestCase):
     def setUp(self):
@@ -167,11 +155,11 @@ class JourneyTest(TestCase):
             start_year=2022,
             end_year=2025,
             tags="sains, kompetitif, mandiri",
-            description=" ".join(["belajar" * 60]), # Jadi ada 60 kata
+            description=" ".join(["belajar"] * 60),  # 60 kata
             order=1,
         )
 
-        self.activity=StageActivity.objects.create(
+        self.activity = StageActivity.objects.create(
             stage=self.stage,
             title="Top 3 OSN Astronomi",
             category=StageActivity.Category.OLIMPIADE,
@@ -206,7 +194,7 @@ class JourneyTest(TestCase):
         self.assertContains(response, "No stages added yet.")
         self.assertNotContains(response, "SMA Negeri 1 Pontianak")
 
-    # Navbar punya link Journey dan nandain sebagai halaman yang sedang dilihat
+    # Navbar punya link Journey dan menandainya sebagai halaman yang sedang dilihat
     def test_navbar_marks_journey_as_current(self):
         response = self.client.get(reverse("main:show_journey"))
 
@@ -226,6 +214,7 @@ class JourneyTest(TestCase):
         with self.assertRaises(ValidationError):
             self.stage.full_clean()
 
+
 class ExperienceFeatureTest(TestCase):
     def setUp(self):
         now = timezone.now()
@@ -241,7 +230,7 @@ class ExperienceFeatureTest(TestCase):
             title="Staff Multimedia", description="Membangun web.",
             category="volunteer", started_at=now - timedelta(days=10),
         )
-        self.admin = User.objects.create_superuser("admin", password="RahasiaAdmin123!")
+        self.admin = User.objects.create_superuser("admin")
         self.client.force_login(self.admin)
 
     def titles(self, response):
@@ -298,47 +287,21 @@ class ExperienceFeatureTest(TestCase):
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["fields"]["title"], "Magang Data")
 
-    @override_settings(PORTFOLIO_SECRET="rahasia-test")
-    def test_create_experience_with_secret(self):
+    def test_create_experience(self):
         response = self.client.post(reverse("main:create_experience"), {
             "title": "Pengalaman Baru", "category": "freelance",
             "description": "Membuat web.", "started_at": "2026-01-01",
-            "ended_at": "", "secret": "rahasia-test",
+            "ended_at": "",
         })
 
         self.assertRedirects(response, reverse("main:show_experience"))
         self.assertTrue(Experience.objects.filter(title="Pengalaman Baru").exists())
 
-    @override_settings(PORTFOLIO_SECRET="rahasia-test")
-    def test_create_experience_rejected_with_wrong_secret(self):
-        response = self.client.post(reverse("main:create_experience"), {
-            "title": "Tidak Boleh Masuk", "category": "freelance",
-            "description": "Membuat web.", "started_at": "2026-01-01",
-            "ended_at": "", "secret": "salah",
-        })
-
-        self.assertContains(response, "Kode rahasia salah.")
-        self.assertFalse(Experience.objects.filter(title="Tidak Boleh Masuk").exists())
-
-    @override_settings(PORTFOLIO_SECRET="rahasia-test")
-    def test_delete_experience_with_secret(self):
+    def test_delete_experience(self):
         target = Experience.objects.get(title="Magang Data")
-        self.client.post(
-            reverse("main:delete_experience", args=[target.id]),
-            {"secret": "rahasia-test"},
-        )
+        self.client.post(reverse("main:delete_experience", args=[target.id]))
 
         self.assertFalse(Experience.objects.filter(pk=target.pk).exists())
-
-    @override_settings(PORTFOLIO_SECRET="rahasia-test")
-    def test_delete_experience_rejected_with_wrong_secret(self):
-        target = Experience.objects.get(title="Magang Data")
-        self.client.post(
-            reverse("main:delete_experience", args=[target.id]),
-            {"secret": "salah"},
-        )
-
-        self.assertTrue(Experience.objects.filter(pk=target.pk).exists())
 
     def test_edit_page_is_prefilled(self):
         target = Experience.objects.get(title="Magang Data")
@@ -362,13 +325,12 @@ class ExperienceFeatureTest(TestCase):
 
         self.assertContains(response, reverse("main:edit_experience", args=[target.id]))
 
-    @override_settings(PORTFOLIO_SECRET="rahasia-test")
-    def test_edit_experience_with_secret(self):
+    def test_edit_experience(self):
         target = Experience.objects.get(title="Magang Data")
         response = self.client.post(reverse("main:edit_experience", args=[target.id]), {
             "title": "Magang Data (Diperbarui)", "category": "internship",
             "description": "Analisis data.", "started_at": "2026-02-01",
-            "ended_at": "", "secret": "rahasia-test",
+            "ended_at": "",
         })
         target.refresh_from_db()
 
@@ -376,15 +338,115 @@ class ExperienceFeatureTest(TestCase):
         self.assertEqual(target.title, "Magang Data (Diperbarui)")
         self.assertEqual(Experience.objects.count(), 3)
 
-    @override_settings(PORTFOLIO_SECRET="rahasia-test")
-    def test_edit_experience_rejected_with_wrong_secret(self):
-        target = Experience.objects.get(title="Magang Data")
-        response = self.client.post(reverse("main:edit_experience", args=[target.id]), {
-            "title": "Judul Curang", "category": "internship",
-            "description": "Analisis data.", "started_at": "2026-02-01",
-            "ended_at": "", "secret": "salah",
-        })
-        target.refresh_from_db()
 
-        self.assertContains(response, "Kode rahasia salah.")
-        self.assertEqual(target.title, "Magang Data")
+class ExperienceRoleTest(TestCase):
+    """Menguji empat peran: pengunjung, pengguna biasa, editor, dan pemilik."""
+
+    def setUp(self):
+        self.experience = Experience.objects.create(
+            title="Magang Data", description="Analisis data.", category="internship",
+        )
+        self.owner = User.objects.create_superuser("owner")
+        self.editor = User.objects.create_user("editor")
+        self.editor.groups.add(Group.objects.create(name="Editor"))
+        self.biasa = User.objects.create_user("biasa")
+
+        self.edit_url = reverse("main:edit_experience", args=[self.experience.id])
+        self.delete_url = reverse("main:delete_experience", args=[self.experience.id])
+        self.star_url = reverse("main:toggle_experience_star", args=[self.experience.id])
+        self.create_url = reverse("main:create_experience")
+        self.list_url = reverse("main:show_experience")
+
+    def edit_data(self, title):
+        return {
+            "title": title, "category": "internship", "description": "Analisis data.",
+            "started_at": "2026-02-01", "ended_at": "",
+        }
+
+    # Pengunjung tanpa login
+    def test_anonymous_can_read_without_action_buttons(self):
+        response = self.client.get(self.list_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Magang Data")
+        self.assertNotContains(response, "Tambah Pengalaman")
+        self.assertNotContains(response, ">Ubah<")
+        self.assertNotContains(response, "Hapus Pengalaman")
+
+    def test_anonymous_redirected_to_login(self):
+        for url in [self.create_url, self.edit_url, self.delete_url, self.star_url]:
+            response = self.client.post(url)
+            self.assertEqual(response.status_code, 302)
+            self.assertIn("/login/", response["Location"])
+
+    # Pengguna biasa
+    def test_regular_user_forbidden_to_change_data(self):
+        self.client.force_login(self.biasa)
+
+        self.assertEqual(self.client.get(self.create_url).status_code, 403)
+        self.assertEqual(self.client.post(self.edit_url, self.edit_data("Curang")).status_code, 403)
+        self.assertEqual(self.client.post(self.delete_url).status_code, 403)
+
+        self.experience.refresh_from_db()
+        self.assertEqual(self.experience.title, "Magang Data")
+
+    def test_regular_user_sees_only_star(self):
+        self.client.force_login(self.biasa)
+        response = self.client.get(self.list_url)
+
+        self.assertContains(response, "star-form")
+        self.assertNotContains(response, "Tambah Pengalaman")
+        self.assertNotContains(response, ">Ubah<")
+        self.assertNotContains(response, "Hapus Pengalaman")
+
+    def test_star_toggle_one_per_user(self):
+        self.client.force_login(self.biasa)
+
+        self.client.post(self.star_url)
+        self.client.post(self.star_url)
+        self.assertEqual(self.experience.starred_by.count(), 0)   # dua kali klik = batal
+
+        self.client.post(self.star_url)
+        self.client.force_login(self.editor)
+        self.client.post(self.star_url)
+        self.assertEqual(self.experience.starred_by.count(), 2)   # satu star per akun
+
+    # Editor
+    def test_editor_can_edit(self):
+        self.client.force_login(self.editor)
+        response = self.client.post(self.edit_url, self.edit_data("Magang Data (Editor)"))
+
+        self.assertRedirects(response, self.list_url)
+        self.experience.refresh_from_db()
+        self.assertEqual(self.experience.title, "Magang Data (Editor)")
+
+    def test_editor_cannot_create_or_delete(self):
+        self.client.force_login(self.editor)
+
+        self.assertEqual(self.client.get(self.create_url).status_code, 403)
+        self.assertEqual(self.client.post(self.delete_url).status_code, 403)
+        self.assertTrue(Experience.objects.filter(pk=self.experience.pk).exists())
+
+    def test_editor_sees_edit_but_not_create_or_delete(self):
+        self.client.force_login(self.editor)
+        response = self.client.get(self.list_url)
+
+        self.assertContains(response, ">Ubah<")
+        self.assertNotContains(response, "Tambah Pengalaman")
+        self.assertNotContains(response, "Hapus Pengalaman")
+
+    # Pemilik
+    def test_owner_sees_all_buttons(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(self.list_url)
+
+        self.assertContains(response, "Tambah Pengalaman")
+        self.assertContains(response, ">Ubah<")
+        self.assertContains(response, "Hapus Pengalaman")
+
+    # API
+    def test_json_shows_username_not_id(self):
+        self.experience.starred_by.add(self.biasa)
+        data = json.loads(self.client.get(reverse("main:get_experience_json")).content)
+
+        self.assertEqual(data[0]["fields"]["starred_by"], [["biasa"]])
