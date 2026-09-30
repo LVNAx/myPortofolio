@@ -1,5 +1,7 @@
 from django.forms import DateInput, ModelForm, Textarea, TextInput, URLInput
 from main.models import Project, Experience
+from django.core.exceptions import ValidationError
+from django.utils.html import strip_tags
 
 class ProjectForm(ModelForm):
     class Meta:
@@ -30,6 +32,7 @@ class ProjectForm(ModelForm):
             "ended_at": "Tanggal Selesai",
         }
 
+
         widgets = {
             "title": TextInput(attrs={"placeholder": "Portfolio Website"}),
             "role": TextInput(attrs={"placeholder": "Fullstack Developer"}),
@@ -41,6 +44,18 @@ class ProjectForm(ModelForm):
             "started_at": DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
             "ended_at": DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
         }
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data["title"]).strip()
+        if not title:
+            raise ValidationError("Nama proyek tidak boleh hanya berisi tag HTML,")
+        return title
+
+    def clean_tech_stack(self):
+        return strip_tags(self.cleaned_data["tech_stack"]).strip()
+
+    def clean_description(self):
+        return strip_tags(self.cleaned_data["description"]).strip()
+    
 
 class ExperienceForm(ModelForm):
 

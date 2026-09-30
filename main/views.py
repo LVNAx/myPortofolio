@@ -4,11 +4,13 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import Person, Mahasiswa, Experience, Project, JourneyStage
 from .forms import ProjectForm, ExperienceForm
 import datetime
+from django.views.decorators.http import require_POST
+from django.templatetags.static import static
 
 PROFILE = {
     "name": "Nugraha",
@@ -69,31 +71,48 @@ def show_journey(request):
 # Endpoint JSON, dipakai juga oleh project_list sebagai sumber data
 def get_projects_json(request):
     title_query = request.GET.get("title", "").strip()
-    projects = Project.objects.all()
+    projects = Project.objects.prefetch_related("starred_by").all()
 
     if title_query:
         projects = projects.filter(title__icontains=title_query)
 
-    projects_json = serializers.serialize(
-        "json", projects, use_natural_foreign_keys=True
-    )
-    return HttpResponse(projects_json, content_type="application/json")
+    # JSON disusun manual supaya bisa menyisipkan logika star per pengguna
+    data = []
+    for project in projects:
+        starred_users = project.starred_by.all()
+        is_starred = request.user.is_authenticated and request.user in starred_users
+
+        data.append({
+            "pk": str(project.id),
+            "fields": {
+                "title": project.title,
+                "role": project.role,
+                "category": project.get_category_display(),
+                "description": project.description,
+                "highlights": project.highlight_list,
+                "tech_stack": project.tech_stack,
+                "thumbnail_url": static(project.thumbnail) if project.thumbnail else "",
+                "live_url": project.live_url,
+                "github_url": project.github_url,
+                "is_ongoing": project.is_ongoing,
+                "star_count": len(starred_users),
+                "is_starred": is_starred,
+                "starred_by_names": ", ".join(u.username for u in starred_users),
+            },
+        })
+
+    return JsonResponse(data, safe=False)
 
 
 def project_list(request):
+    # Daftar proyek tidak lagi dirender di sini. Halaman hanya membawa kerangka,
+    # lalu JavaScript mengambil datanya dari get_projects_json.
     title_query = request.GET.get("title", "").strip()
-
-    # Data diambil lewat endpoint JSON, lalu diubah kembali menjadi objek Project
-    json_response = get_projects_json(request)
-    projects = [
-        item.object
-        for item in serializers.deserialize("json", json_response.content.decode("utf-8"))
-    ]
 
     context = {
         **PROFILE,
-        "projects": projects,
         "title_query": title_query,
+        "form": ProjectForm(),
     }
     return render(request, "projects.html", context)
 
@@ -281,3 +300,21 @@ def toggle_experience_star(request, experience_id):
             experience.starred_by.add(request.user)
 
     return redirect("main:show_experience")
+
+@require_POST # Hanya menerima method POST, yang lain 405
+def create_project_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan proyek."},
+            status = 403,
+        )
+
+    form = ProjectForm(request.POST)
+    if form.is_valid():
+        project = form.save()
+        return JsonResponse(
+            {"message": "Proyek berhasil ditambahkan.", "pk":str(project.id)},
+            status = 201,
+        )
+
+    return JsonResponse({"errors":form.errors.get_json_data()}, status=400)
