@@ -1,3 +1,4 @@
+import datetime
 from django.contrib import messages
 from django.contrib.auth import login, logout 
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
@@ -6,11 +7,11 @@ from django.core.exceptions import PermissionDenied
 from django.core import serializers
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import Person, Mahasiswa, Experience, Project, JourneyStage
-from .forms import ProjectForm, ExperienceForm
-import datetime
 from django.views.decorators.http import require_POST
 from django.templatetags.static import static
+from django.db.models import Q
+from .models import Person, Mahasiswa, Experience, Project, JourneyStage, Certification
+from .forms import ProjectForm, ExperienceForm, CertificationForm
 
 PROFILE = {
     "name": "Nugraha",
@@ -318,3 +319,78 @@ def create_project_ajax(request):
         )
 
     return JsonResponse({"errors":form.errors.get_json_data()}, status=400)
+
+def show_certification(request):
+    # Datanya akan tetap kita ambil dari .js
+    context = {
+        **PROFILE,
+        "form": CertificationForm(),
+    }
+    return render(request, "certifications.html", context)
+
+def get_certifications_json(request):
+    # Pakai Q object agar pencarian bisa mencocokkan title ATAU issuer (kondisi OR)
+    query = request.GET.get("q", "").strip()
+    certifications = Certification.objects.prefetch_related("starred_by").all() # we use prefetch_related bcs we used many to many models on starred_by
+
+    if query:
+        certifications = certifications.filter(
+            Q(title__icontains=query) | Q(issuer__icontains=query)
+        )
+
+    data = []
+    for certification in certifications:
+        starred_users = certification.starred_by.all()
+        is_starred = request.user.is_authenticated and request.user in starred_users
+
+        data.append({
+            "pk": str(certification.id),
+            "fields": {
+                "title": certification.title,
+                "issuer": certification.issuer,
+                "category": certification.get_category_display(),
+                "issued_at": certification.issued_at.strftime("%d %b %Y"),
+                "credential_url": certification.credential_url or "",
+                "star_count": len(starred_users),
+                "is_starred": is_starred,
+                "starred_by_names": ", ".join(u.username for u in starred_users),
+            }
+        })
+
+    """
+    Kalo ingin pakai serializers seharusnya begini sih:
+    certificationjson = serializers.serialize("json", certifications)
+    return HttpResponse(certification_json, content_type="application/json)
+    """
+    return JsonResponse(data, safe=False)
+
+@require_POST
+def create_certification_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik porto yang bisa menambahkan sertifikasi"},
+            status=403,
+        )
+
+    form = CertificationForm(request.POST)
+    if form.is_valid():
+        certification = form.save()
+        return JsonResponse(
+            {"message": "Sertifikasi berhasil ditambahkan.", "pk":str(certification.id)},
+            status=201,
+        )
+
+    return JsonResponse({"errors":form.errors.get_json_data()}, status=400)
+
+@login_required(login_url="/login/")
+def toggle_certification_star(request, certification_id):
+    certification=get_object_or_404(Certification, pk=certification_id)
+
+    if request.method == "POST":
+        if request.user in certification.starred_by.all():
+            certification.starred_by.remove(request.user)
+        else:
+            certification.starred_by.add(request.user)
+
+    return redirect("main:show_certification")
+        

@@ -1,7 +1,8 @@
 from django.urls import path
 from main.views import (show_main, show_experience, project_list, show_journey, create_project, get_projects_json, 
                         delete_project, create_experience, delete_experience, get_experience_json, edit_experience,
-                        register, login_user, logout_user, toggle_star, toggle_experience_star, create_project_ajax)
+                        register, login_user, logout_user, toggle_star, toggle_experience_star, create_project_ajax,
+                        show_certification, get_certifications_json, create_certification_ajax, toggle_certification_star)
 
 app_name = "main"
 
@@ -34,4 +35,10 @@ urlpatterns = [
         toggle_star,
         name="toggle_star",
     ),
+
+    # Certification Path
+    path("certifications/", show_certification, name="show_certification"),
+    path("api/certifications/", get_certifications_json, name="get_certifications_json"),
+    path("certifications/add-ajax/", create_certification_ajax, name="create_certification_ajax"),
+    path("certifications/<uuid:certification_id>/star/", toggle_certification_star, name="toggle_certification_star"),
 ]

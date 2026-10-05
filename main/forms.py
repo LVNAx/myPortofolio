@@ -1,7 +1,46 @@
 from django.forms import DateInput, ModelForm, Textarea, TextInput, URLInput
-from main.models import Project, Experience
+from main.models import Project, Experience, Certification
 from django.core.exceptions import ValidationError
 from django.utils.html import strip_tags
+
+class CertificationForm(ModelForm):
+    class Meta:
+        model = Certification
+        fields = [
+            "title",
+            "issuer",
+            "category",
+            "issued_at",
+            "credential_url",
+        ]
+
+        labels = {
+            "title": "Nama Sertifikasi",
+            "issuer": "Nama penerbit",
+            "category": "Kategori",
+            "issued_at": "Tanggal Terbit",
+            "credential_url": "Bukti Sertifikasi",
+        }
+
+        widgets = {
+            "title": TextInput(attrs={"placeholder": "Meta Backend Developer"}),
+            "issuer": TextInput(attrs={"placeholder": "Coursera"}),
+            "issued_at": DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
+            "credential_url": URLInput(attrs={"placeholder": "https://coursera.org/verify/.."}),
+        }
+
+    
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data["title"]).strip()
+        if not title:
+            raise ValidationError("Nama sertifikat tidak boleh hanya berisi tag HTML.")
+        return title
+
+    def clean_issuer(self):
+        issuer = strip_tags(self.cleaned_data["issuer"]).strip()
+        if not issuer:
+            raise ValidationError("Nama penerbit tidak boleh hanya berisi tag HTML.")
+        return issuer
 
 class ProjectForm(ModelForm):
     class Meta:
