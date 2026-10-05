@@ -196,18 +196,43 @@ Contoh: `/api/experience/?category=volunteer&sort=oldest`
 
    Serialization perlu dilakukan karena data dari database masih berupa objek Python, sedangkan yang bisa dikirim lewat internet hanya teks. Dengan diubah menjadi JSON, data bisa dibaca oleh browser atau aplikasi lain yang tidak mengerti Python.
 
-# Tugas-3
+# Tugas-4
 ## Progress Mingguan
 | Hari / Tanggal | Progress |
 |---|---|
-| Senin, 14 September | - |
-| Selasa, 15 September | - |
-| Rabu, 16 September | - |
-| Kamis, 17 September | - |
-| Jumat, 18 September | - |
-| Sabtu, 19 September | Menyelesaikan tutorial-4 |
-| Minggu, 20 September | Menambahkan Group Editor |
-| Senin, 21 September | Menyelesaikan tugas-4 dengan menerapkannya di Experience dan juga Project dengan menambahkan testing juga |
+| Senin, 21 September | - |
+| Selasa, 22 September | - |
+| Rabu, 23 September | - |
+| Kamis, 24 September | - |
+| Jumat, 25 September | - |
+| Sabtu, 26 September | Menyelesaikan tutorial-4 |
+| Minggu, 27 September | Menambahkan Group Editor |
+| Senin, 28 September | Menyelesaikan tugas-4 dengan menerapkannya di Experience dan juga Project dengan menambahkan testing juga |
 
 ## AI Disclosure
 - **[Chat 1-Model: Claude Sonnet-5 Medium](https://claude.ai/share/81e6797e-cf36-46c6-909d-bb2bef6a130e)** digunakan untuk memahami kode (mengenai Auth, Cookie, Session), mengimprove kode, dan juga memperbaiki beberapa error
+
+# Tugas-5
+## Progres Mingguan
+| Hari / Tanggal | Progress |
+|---|---|
+| Senin, 28 September | Memahami lebih lanjut mengenai Javascript di w3schools|
+| Selasa, 29 September | Mulai mengerjakan tutorial-5 |
+| Rabu, 30 September | Menyelesaikan tutorial-5 |
+| Kamis, 1 Oktober | - |
+| Jumat, 2 Oktober | Mereview kembali Javascript |
+| Sabtu, 3 Oktober | Mulai mengerjakan Tugas-5 dan memilih untuk membuat models baru yakni Certifications untuk mereview kembali materi dari awal |
+| Minggu, 4 Oktober | Menyelesaikan views, url, models, dan juga components untuk certifications |
+| Senin, 5 Oktober | Menyelesaikan bagian Javascriptnya |
+
+## AI Disclosure
+- **[Chat 1-Model: Claude Sonnet-5 High](https://claude.ai/share/493cad2d-6a56-41ce-9f9f-5d8e40ff3571)** digunakan untuk memahami kode, fix error, dan juga membuat kode untuk di beberapa bagian
+- **[Chat 2-Model: Gemini-3.5 Flash-Lite](https://share.gemini.google/ldBBcnbD9HMi)** sama seperti yang Claude, ini untuk memahami kode akan tetapi untuk jawaban yang lebih cepat. 
+> Untuk tugas-5 ini sebenarnya lebih banyak menggunakan Google (AI Summary) :)
+
+1. Jelaskan apa itu debouncing dan mengapa teknik ini penting diterapkan pada fitur pencarian yang menggunakan AJAX!
+> Selama tutorial dan tugas 5 ini, debouncing adalah sebuah teknik untuk menunda browser melakukan request setiap kali user melakukan input sesuatu yang mana kalo di website portofolio ini kita menggunakan fitur search yang memungkinkan hal tersebut. Jadi, misal user pengen search project mengenai web development. Nah, ia akan mengirimkan request berkali2 (di sini asumsinya w--e--b-- -- dst) setiap kali hurufnya diketik, sehingga kita butuh debouncer ini agar jarak antara user memberhentikan ketikan dan browser melakukan request itu menjadi lebih optimal dengan `setTimeout` dan `clearTimeout` di mana kalo di certification ini waktu debouncenya sekitar `300 ms`. Nah, AJAX sendiri mengambil data di background tanpa memuat ulang halaman, sehingga pencarian bisa dipicu setiap kali user mengetik. Justru karena itu risiko banyak request muncul, dan debouncing dipakai untuk membatasinya. Pada form biasa tanpa AJAX, request hanya terkirim saat pengguna menekan Enter, jadi masalah ini tidak ada.
+2. Jelaskan fungsi dari penggunaan await ketika kita menggunakan fetch()! Apa yang akan terjadi jika kita tidak menggunakan await?
+> `fetch()` itu ngga langsung ngasih data, tapi ngembaliin sebuah Promise, yaitu semacam janji bahwa hasilnya bakal datang nanti karena ngambil data dari server itu butuh waktu. Nah, `await` dipakai untuk menunggu Promise tersebut selesai, sehingga hasil yang kita pegang benar-benar objek Response asli dari server, bukan Promise yang masih pending. await ini cuma bisa dipakai di dalam `fungsi async`, dan yang berhenti nunggu itu cuma fungsinya aja, halamannya sendiri tetap responsif dan ngga nge-freeze. Hal ini juga berlaku untuk `response.json()` yang sama-sama ngembaliin Promise, jadi perlu await juga supaya isi datanya bisa dibaca. Kalo ngga pakai await, kodenya bakal lanjut ke baris berikutnya padahal datanya belum ada, misalnya `response.ok` jadi `undefined` karena response masih berupa Promise sehingga kode salah mengira request-nya gagal, dan kalo .json() ngga di-await, datanya masih berupa Promise sehingga ngga bisa dipakai untuk di-loop atau dihitung panjangnya dan muncul TypeError. Hal ini juga ngebuat error jaringan ngga bisa ketangkap try/catch, karena kegagalannya baru terjadi setelah blok try selesai. Hal ini sempat saya cek langsung di console: console.log(fetch('/api/certifications/')) cuma menampilkan Promise {<pending>}, sedangkan console.log(await fetch('/api/certifications/')) menampilkan objek Response dengan status 200.
+3. Jelaskan apa itu serangan XSS (Cross-Site Scripting) dan mengapa data yang ditampilkan melalui AJAX/JavaScript lebih rentan terhadap serangan ini daripada data yang ditampilkan langsung melalui template Django!
+> `XSS (Cross-Site Scripting)` adalah serangan di mana penyerang menyisipkan kode berbahaya, misalnya `<img src="x" onerror="alert('XSS!')">`, ke dalam data yang disimpan di website, sehingga kode itu ikut dijalankan di browser setiap pengunjung yang membuka halaman tersebut. Nah, template Django secara otomatis melakukan escaping pada {{ }}, menjadi karakter seperti < dan > diubah menjadi teks biasa dan tidak dianggap sebagai HTML. Sedangkan kalau data ditampilkan lewat AJAX, kita menyisipkannya sendiri ke halaman dengan innerHTML, dan innerHTML membaca teks itu sebagai HTML mentah tanpa escaping otomatis sama sekali. Karena itu, data dari JSON harus kita amankan sendiri, misalnya dengan `escapeHtml` atau `textContent`, dan di sisi server dibersihkan dengan  `strip_tags`, supaya kode berbahaya tampil sebagai teks biasa dan tidak dieksekusi

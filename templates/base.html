@@ -40,7 +40,9 @@
                 <a href="{% url 'main:show_experience' %}"
                    {% if current == 'show_experience' or current == 'create_experience' or current == 'edit_experience' %}aria-current="page"{% endif %}>Experience</a>
                 <a href="{% url 'main:project_list' %}"
-                   {% if current == 'project_list' %}aria-current="page"{% endif %}>Projects</a>
+                    {% if current == 'project_list' %}aria-current="page"{% endif %}>Projects</a>
+                <a href="{% url 'main:show_certification' %}"
+                    {% if current == "show_certification" %}aria-current="page"{% endif %}>Certifications</a>
                 {% if user.is_authenticated %}
                     <span class="nav-user">{{ user.username }}</span>
                     <a href="{% url 'main:logout_user' %}">Logout</a>
@@ -71,6 +73,7 @@
         </div>
     </footer>
 
+    {% include 'components/toast.html' %}
     <script>
         // Navbar Hamburger
         const navToggle = document.querySelector('.nav-toggle');
