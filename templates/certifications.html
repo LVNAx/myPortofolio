@@ -1,0 +1,221 @@
+<!-- Di sini kita akan menggunakan project.css biar ngga nambah lagi aja -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Certifications{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/projects.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <header class="page-header project-header">
+            <div>
+                <p class="kicker">Learning &amp; credentials</p>
+                <h1 class="page-title">Certifications</h1>
+            </div>
+            {% if user.is_superuser %}
+            <button type="button"
+                    class="button project-add-button"
+                    popovertarget="add-certification-modal">
+                    <span aria-hidden="true">+</span>
+                    Tambah Sertifikasi    
+                </button>
+            {% endif %}
+        </header>
+
+        <form id="certification-search-form" class="project-search">
+            <input type="search" id="search-input" name="q" placeholder="Cari judul atau penerbit" class="project-search__input" aria-label="Cari judul atau penerbit">
+            <button type="submit" class="button">Cari</button>
+        </form>
+        <p id="result-count"></p>
+
+        <div id="loading" class="empty-state hide">
+            <p>Memuat sertifikasi...</p>
+        </div>
+
+        <div id="error" class="empty-state hide">
+            <p>Gagal memuat data sertifikasi. Silakan coba lagi.</p>
+        </div>
+        
+        <div id="empty" class="empty-state hide"> 
+            <p>Belum ada sertifikasi yang ditambahkan atau ditemukan.</p>
+        </div>
+
+        <div id="grid" class="experience-grid project-grid hide"></div>
+    </div>
+</section>
+
+{% if user.is_superuser %}
+    {% include "components/certification_form_modal.html" %}
+{% endif %}
+
+<script>
+    const CERTIFICATIONS_ENDPOINT = "{% url 'main:get_certifications_json' %}";
+    const CREATE_CERTIFICATION_ENDPOINT = "{% url 'main:create_certification_ajax' %}";
+    let certificationsAbortController;
+
+    const loadingState = document.getElementById('loading');
+    const errorState = document.getElementById('error');
+    const emptyState = document.getElementById('empty');
+    const gridContainer = document.getElementById('grid');
+    const searchForm = document.getElementById('certification-search-form');
+    const searchInput = document.getElementById('search-input');
+    const certificationForm = document.getElementById('certification-form'); // bisa null karena bukan superuser
+    const SEARCH_DEBOUNCE_DELAY = 300;
+    const resultCount = document.getElementById('result-count');
+    let searchDebounceTimer;
+
+    function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false}) {
+        loadingState.classList.toggle('hide', !showLoading);
+        errorState.classList.toggle('hide', !showError);
+        emptyState.classList.toggle('hide', !showEmpty);
+        gridContainer.classList.toggle('hide', !showGrid);
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length+1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+      function buildCertificationCardElement(item) {
+        const certification = item.fields;
+        const certificationId = item.pk;
+        const articleElement = document.createElement('article');
+        articleElement.className = 'experience-card';
+        const credentialHtml = certification.credential_url
+            ? `<a href="${escapeHtml(certification.credential_url)}" class="button" target="_blank" rel="noopener noreferrer">Lihat Kredensial</a>`
+            : '';
+        const starUrl = "{% url 'main:toggle_certification_star' '00000000-0000-0000-0000-000000000000' %}"
+            .replace('00000000-0000-0000-0000-000000000000', certificationId);
+        const isStarredClass = certification.is_starred ? " is-starred" : "";
+        const starText = certification.is_starred ? "Unstar" : "Star";
+        const starTitle = certification.star_count > 0
+            ? `Dibintangi oleh ${escapeHtml(certification.starred_by_names)}`
+            : "Jadilah yang pertama memberi star";
+        articleElement.innerHTML = `
+            <h2>${escapeHtml(certification.title)}</h2>
+            <span class="experience-category">${escapeHtml(certification.category)}</span>
+            <p class="experience-description">${escapeHtml(certification.issuer)} · ${escapeHtml(certification.issued_at)}</p>
+            <div class="project-card-actions">
+                <div class="project-actions">
+                    ${credentialHtml}
+                    <form method="post" action="${starUrl}" class="star-form">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="button button-star${isStarredClass}"
+                                title="${starTitle}">
+                            <span aria-hidden="true">★</span>
+                            ${starText}
+                            <span class="star-count">${certification.star_count}</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        `;
+        return articleElement;
+    }
+    async function fetchCertifications(searchQuery = "") {
+        if (certificationsAbortController) certificationsAbortController.abort();
+        certificationsAbortController = new AbortController();
+        try {
+            displayPageSection({ showLoading: true });
+            const url = searchQuery
+                ? `${CERTIFICATIONS_ENDPOINT}?q=${encodeURIComponent(searchQuery)}`
+                : CERTIFICATIONS_ENDPOINT;
+            const response = await fetch(url, {
+                headers: { 'Accept': 'application/json' },
+                signal: certificationsAbortController.signal,
+            });
+            if (!response.ok) throw new Error('Failed to fetch data');
+            const certificationData = await response.json();
+            resultCount.textContent = `${certificationData.length} sertifikat ditemukan`;
+            if (certificationData.length === 0) {
+                displayPageSection({ showEmpty: true });
+            } else {
+                gridContainer.innerHTML = '';
+                certificationData.forEach(item => {
+                    gridContainer.appendChild(buildCertificationCardElement(item));
+                });
+                displayPageSection({ showGrid: true });
+            }
+        } catch (error) {
+            if (error.name === 'AbortError') return;
+            resultCount.textContent = '';
+            console.error('Error loading certifications:', error);
+            displayPageSection({ showError: true });
+        }
+    }
+    // Pencarian dengan debouncing
+    searchInput.addEventListener('input', function () {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(function () {
+            fetchCertifications(searchInput.value.trim());
+        }, SEARCH_DEBOUNCE_DELAY);
+    });
+    searchForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        clearTimeout(searchDebounceTimer);
+        fetchCertifications(searchInput.value.trim());
+    });
+    // Tambah sertifikasi lewat modal
+    function closeCertificationModal() {
+        const modal = document.getElementById('add-certification-modal');
+        if (modal) modal.hidePopover();
+    }
+    async function addCertification(event) {
+        event.preventDefault();
+        const submitButton = certificationForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        try {
+            const response = await fetch(CREATE_CERTIFICATION_ENDPOINT, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                body: new FormData(certificationForm),
+            });
+            const result = await response.json().catch(() => ({}));
+            if (response.ok) {
+                certificationForm.reset();
+                closeCertificationModal();
+                showToast('Berhasil', 'Sertifikasi baru berhasil ditambahkan!', 'success');
+                fetchCertifications(searchInput.value.trim());
+            } else {
+                const errorMessages = result.errors
+                    ? Object.values(result.errors).flat().map(error => error.message)
+                    : [result.message || `Terjadi kesalahan (status ${response.status}).`];
+                showToast('Gagal menambahkan sertifikasi', errorMessages.join(' '), 'error');
+            }
+        } catch (error) {
+            console.error('Error adding certification:', error);
+            showToast('Gagal menambahkan sertifikasi', 'Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
+        } finally {
+            submitButton.disabled = false;
+        }
+    }
+    if (certificationForm) {
+        certificationForm.addEventListener('submit', addCertification);
+    }
+    fetchCertifications(searchInput.value.trim());
+</script>
+{% endblock content %}
