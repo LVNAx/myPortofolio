@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from main.models import Experience, JourneyStage, Project, StageActivity
+from main.models import Experience, JourneyStage, Project, StageActivity, Certification
 
 
 class MainTest(TestCase):
@@ -87,22 +87,31 @@ class ProjectTest(TestCase):
         self.assertTemplateUsed(response, "projects.html")
 
     def test_project_page_displays_data(self):
+        response = self.client.get(reverse("main:get_projects_json"))
+        item = json.loads(response.content)[0]["fields"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(item["title"], self.project.title)
+        self.assertEqual(item["role"], self.project.role)
+        self.assertEqual(item["description"], self.project.description)
+        self.assertEqual(item["category"], "Web Development")
+        self.assertIn("Resend email otomatis", item["highlights"])
+        self.assertEqual(item["live_url"], self.project.live_url)
+        self.assertTrue(item["is_ongoing"])
+
+    def test_project_page_is_a_skeleton(self):
         response = self.client.get(reverse("main:project_list"))
 
-        self.assertContains(response, self.project.title)
-        self.assertContains(response, self.project.role)
-        self.assertContains(response, self.project.description)
-        self.assertContains(response, "Web Development")
-        self.assertContains(response, "Resend email otomatis")
-        self.assertContains(response, "Tailwind CSS")
-        self.assertContains(response, "Ongoing")
-        self.assertContains(response, self.project.live_url)
+        # Data tidak dirender server, hanya wadah yang akan diisi JavaScript
+        self.assertNotContains(response, self.project.title)
+        self.assertContains(response, 'id="grid"')
+        self.assertContains(response, 'id="empty"')
 
     def test_empty_project_page(self):
         Project.objects.all().delete()
-        response = self.client.get(reverse("main:project_list"))
+        response = self.client.get(reverse("main:get_projects_json"))
 
-        self.assertContains(response, "No projects added yet.")
+        self.assertEqual(json.loads(response.content), [])
 
     def test_project_model(self):
         self.assertEqual(str(self.project), "Sandbox")
@@ -112,19 +121,31 @@ class ProjectTest(TestCase):
         self.assertEqual(len(self.project.highlight_list), 2)
         self.assertTrue(self.project.is_ongoing)
 
+    # def test_completed_project(self):
+    #     self.project.ended_at = date(2026, 8, 1)
+    #     self.project.save()
+    #     response = self.client.get(reverse("main:project_list"))
+
+    #     self.assertFalse(self.project.is_ongoing)
+    #     self.assertContains(response, "Completed")
+    #     self.assertNotContains(response, "Ongoing")
+
     def test_completed_project(self):
         self.project.ended_at = date(2026, 8, 1)
         self.project.save()
-        response = self.client.get(reverse("main:project_list"))
+        response = self.client.get(reverse("main:get_projects_json"))
+        item = json.loads(response.content)[0]["fields"]
 
         self.assertFalse(self.project.is_ongoing)
-        self.assertContains(response, "Completed")
-        self.assertNotContains(response, "Ongoing")
+        self.assertFalse(item["is_ongoing"])
 
     def test_github_button_hidden_when_url_empty(self):
-        response = self.client.get(reverse("main:project_list"))
+        response = self.client.get(reverse("main:get_projects_json"))
+        item = json.loads(response.content)[0]["fields"]
 
-        self.assertNotContains(response, "GitHub")
+        self.assertFalse(item["github_url"], "")
+
+        
 
     def test_navbar_links_to_main(self):
         response = self.client.get(reverse("main:project_list"))
@@ -450,3 +471,117 @@ class ExperienceRoleTest(TestCase):
         data = json.loads(self.client.get(reverse("main:get_experience_json")).content)
 
         self.assertEqual(data[0]["fields"]["starred_by"], [["biasa"]])
+
+class CertificationTest(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_superuser("owner")
+        self.biasa = User.objects.create_user("biasa")
+        self.sertifikat = Certification.objects.create(
+            title="Meta Backend Developer",
+            issuer="Coursera",
+            category="swe",
+            issued_at=date(2026, 1, 15),
+        )
+        self.data_valid = {
+            "title": "Google Data Analytics",
+            "issuer": "Google",
+            "category": "dsai",
+            "issued_at": "2026-02-01",
+            "credential_url": "",
+        }
+
+    # Halaman dan JSON
+    def test_page_is_accessible_by_visitor(self):
+        response = self.client.get(reverse("main:show_certification"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "certifications.html")
+        # Kerangka saja: data tidak dirender server
+        self.assertNotContains(response, self.sertifikat.title)
+
+    def test_json_returns_data_with_star_info(self):
+        response = self.client.get(reverse("main:get_certifications_json"))
+        item = json.loads(response.content)[0]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(item["fields"]["title"], "Meta Backend Developer")
+        self.assertEqual(item["fields"]["star_count"], 0)
+        self.assertFalse(item["fields"]["is_starred"])
+
+    def test_json_search_matches_title_or_issuer(self):
+        url = reverse("main:get_certifications_json")
+
+        self.assertEqual(len(json.loads(self.client.get(url, {"q": "backend"}).content)), 1)
+        self.assertEqual(len(json.loads(self.client.get(url, {"q": "coursera"}).content)), 1)
+        self.assertEqual(json.loads(self.client.get(url, {"q": "tidakada"}).content), [])
+
+    # Tambah data
+    def test_visitor_cannot_add(self):
+        response = self.client.post(reverse("main:create_certification_ajax"), self.data_valid)
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Certification.objects.count(), 1)
+
+    def test_normal_user_cannot_add(self):
+        self.client.force_login(self.biasa)
+        response = self.client.post(reverse("main:create_certification_ajax"), self.data_valid)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_owner_can_add(self):
+        self.client.force_login(self.owner)
+        response = self.client.post(reverse("main:create_certification_ajax"), self.data_valid)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Certification.objects.count(), 2)
+
+    def test_invalid_data_returns_400_with_errors(self):
+        self.client.force_login(self.owner)
+        data = {**self.data_valid, "title": ""}
+        response = self.client.post(reverse("main:create_certification_ajax"), data)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("title", json.loads(response.content)["errors"])
+
+    def test_get_method_is_not_allowed(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse("main:create_certification_ajax"))
+
+        self.assertEqual(response.status_code, 405)
+
+    # XSS
+    def test_tags_are_stripped_from_input(self):
+        self.client.force_login(self.owner)
+        data = {**self.data_valid, "title": "<b>Halo</b>"}
+        self.client.post(reverse("main:create_certification_ajax"), data)
+
+        self.assertTrue(Certification.objects.filter(title="Halo").exists())
+
+    def test_title_with_only_tags_is_rejected(self):
+        self.client.force_login(self.owner)
+        data = {**self.data_valid, "title": '<img src="x" onerror="alert(1)">'}
+        response = self.client.post(reverse("main:create_certification_ajax"), data)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Certification.objects.count(), 1)
+
+    # Star
+    def test_star_requires_login(self):
+        url = reverse("main:toggle_certification_star", args=[self.sertifikat.id])
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response.url)
+        self.assertEqual(self.sertifikat.starred_by.count(), 0)
+
+    def test_star_toggles_and_shows_in_json(self):
+        self.client.force_login(self.biasa)
+        url = reverse("main:toggle_certification_star", args=[self.sertifikat.id])
+
+        self.client.post(url)
+        item = json.loads(self.client.get(reverse("main:get_certifications_json")).content)[0]
+        self.assertEqual(item["fields"]["star_count"], 1)
+        self.assertTrue(item["fields"]["is_starred"])
+
+        self.client.post(url)
+        self.assertEqual(self.sertifikat.starred_by.count(), 0)
