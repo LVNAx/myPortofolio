@@ -52,10 +52,32 @@ class Experience(models.Model):
     @property
     def is_ongoing(self):
         return self.ended_at is None
+    
+"""
+> Membuat Models baru bernama Sertifikasi (Certifications) yang akan mereview semua materi dari awal hingga akhir.
+"""
+class Certification(models.Model):
+    CATEGORY = [
+        ("swe", "Software Engineering"),
+        ("sde", "Software Development"),
+        ("dsai", "Data Science and AI"),
+        ("cybersec", "Cyber Security")
+    ]
 
-import uuid
-from django.db import models
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.TextField(help_text="Pastikan Kapital")
+    issuer = models.TextField()
+    category = models.CharField(max_length=40, choices=CATEGORY, default="swe")
+    issued_at = models.DateField()
+    credential_url = models.URLField(blank=True, null=True)
+    starred_by = models.ManyToManyField(
+        User, related_name="starred_certifications", blank=True
+    )
+    class Meta:
+        ordering = ["-issued_at"]
 
+    def __str__(self):
+        return self.title
 
 class Project(models.Model):
     CATEGORY_CHOICES = [

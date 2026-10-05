@@ -7,6 +7,7 @@ from .models import (
     Project,
     JourneyStage,
     StageActivity,
+    Certification,
 )
 
 admin.site.register(Person)
@@ -54,3 +55,10 @@ class StageActivityAdmin(admin.ModelAdmin):
     list_display = ("title", "stage", "category", "order")
     list_filter = ("category", "stage")
     search_fields = ("title", "role")
+
+@admin.register(Certification)
+class CertificationAdmin(admin.ModelAdmin):
+    list_display = ("title", "issuer", "issued_at", "credential_url", "category")
+    list_filter = ("category",)
+    search_fields = ("title", "issuer")
+    ordering = ("-issued_at",)
