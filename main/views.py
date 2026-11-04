@@ -320,11 +320,13 @@ def create_project_ajax(request):
 
     return JsonResponse({"errors":form.errors.get_json_data()}, status=400)
 
+# Starts from here. 
 def show_certification(request):
     # Datanya akan tetap kita ambil dari .js
     context = {
         **PROFILE,
         "form": CertificationForm(),
+        "can_edit": can_edit(request.user),
     }
     return render(request, "certifications.html", context)
 
@@ -379,7 +381,6 @@ def create_certification_ajax(request):
             {"message": "Sertifikasi berhasil ditambahkan.", "pk":str(certification.id)},
             status=201,
         )
-
     return JsonResponse({"errors":form.errors.get_json_data()}, status=400)
 
 @login_required(login_url="/login/")

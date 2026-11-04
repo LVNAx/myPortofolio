@@ -86,7 +86,7 @@ class Project(models.Model):
         ("competition", "Competition"),
         ("course", "Course Project"),
     ]
-
+    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # Samakan aja pakai ID kayak Experience
     title = models.CharField(max_length=120)
     role = models.CharField(max_length=120)
