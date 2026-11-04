@@ -23,3 +23,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')), 
 ]
+
+# Tutorial 07: API berbasis Django REST Framework
+urlpatterns += [
+    path("api/v1/", include("main.api_urls")),
+    path("api-auth/", include("rest_framework.urls")),
+]
