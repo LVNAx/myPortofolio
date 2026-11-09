@@ -179,7 +179,33 @@ class CertificationAPITest(APITestCase):
             self.assertEqual(self.client.post(self.list_url, self.payload, format="json").status_code, 403)
             self.assertEqual(self.client.patch(self.detail_url, {"title": "X"}, format="json").status_code, 403)
             self.assertEqual(self.client.delete(self.detail_url).status_code, 403)
+            self.assertEqual(self.client.put(self.detail_url, self.payload, format="json").status_code, 403)
+        # Pastikan database benar-benar tidak berubah, bukan hanya statusnya 403
         self.assertEqual(Certification.objects.count(), 1)
+        self.assertFalse(Certification.objects.filter(title="Google Data Analytics").exists())
+        self.certification.refresh_from_db()
+        self.assertEqual(self.certification.title, "Meta Backend Developer")
+        self.assertEqual(self.certification.issuer, "Coursera")
+
+    def test_staff_without_editor_group_cannot_patch(self):
+        self.regular.is_staff = True
+        self.regular.save()
+        self.client.force_authenticate(user=self.regular)
+        response = self.client.patch(self.detail_url, {"title": "Changed"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.certification.refresh_from_db()
+        self.assertEqual(self.certification.title, "Meta Backend Developer")
+
+    def test_missing_certification_returns_404(self):
+        url = reverse("api:certification-detail", args=[uuid.uuid4()])
+        self.assertEqual(self.client.get(url).status_code, status.HTTP_404_NOT_FOUND)
+        self.client.force_authenticate(user=self.owner)
+        self.assertEqual(
+            self.client.patch(url, {"title": "X"}, format="json").status_code,
+            status.HTTP_404_NOT_FOUND,
+        )
+        star_url = reverse("api:certification-star", args=[uuid.uuid4()])
+        self.assertEqual(self.client.post(star_url).status_code, status.HTTP_404_NOT_FOUND)
 
     def test_editor_can_patch_and_put(self):
         self.client.force_authenticate(user=self.editor)
@@ -196,6 +222,20 @@ class CertificationAPITest(APITestCase):
         self.assertEqual(self.client.post(self.list_url, self.payload, format="json").status_code, 403)
         self.assertEqual(self.client.delete(self.detail_url).status_code, 403)
         self.assertTrue(Certification.objects.filter(pk=self.certification.pk).exists())
+        self.assertEqual(Certification.objects.count(), 1)
+        self.assertFalse(Certification.objects.filter(title="Google Data Analytics").exists())
+
+    def test_editor_patch_is_validated_and_stripped(self):
+        self.client.force_authenticate(user=self.editor)
+        response = self.client.patch(self.detail_url, {"title": "<i>Meta</i> Backend"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.certification.refresh_from_db()
+        self.assertEqual(self.certification.title, "Meta Backend")
+        response = self.client.patch(self.detail_url, {"issuer": "<script></script>"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("issuer", response.data)
+        self.certification.refresh_from_db()
+        self.assertEqual(self.certification.issuer, "Coursera")
 
     def test_owner_can_create_and_delete(self):
         self.client.force_authenticate(user=self.owner)
@@ -221,6 +261,7 @@ class CertificationAPITest(APITestCase):
 
     def test_star_requires_login_and_toggles(self):
         self.assertEqual(self.client.post(self.star_url).status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(self.certification.starred_by.count(), 0)
         self.client.force_authenticate(user=self.regular)
         self.assertEqual(self.client.get(self.star_url).status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
         response = self.client.post(self.star_url)
@@ -229,3 +270,43 @@ class CertificationAPITest(APITestCase):
         response = self.client.post(self.star_url)
         self.assertFalse(response.data["is_starred"])
         self.assertEqual(response.data["star_count"], 0)
+        self.assertFalse(self.certification.starred_by.exists())
+
+    def test_star_uses_request_user_only(self):
+        # Klien tidak bisa memberi star atas nama akun lain lewat body request
+        self.client.force_authenticate(user=self.regular)
+        self.client.post(self.star_url, {"user": self.owner.id, "starred_by": [self.owner.id]}, format="json")
+        self.assertEqual(list(self.certification.starred_by.all()), [self.regular])
+
+    def test_editor_and_regular_can_star(self):
+        for user in (self.editor, self.regular):
+            self.client.force_authenticate(user=user)
+            self.assertEqual(self.client.post(self.star_url).status_code, status.HTTP_200_OK)
+        self.assertEqual(self.certification.starred_by.count(), 2)
+
+    def test_session_write_without_csrf_is_rejected(self):
+        client = APIClient(enforce_csrf_checks=True)
+        self.assertTrue(client.login(username="owner", password="test-password"))
+        response = client.post(self.list_url, self.payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Certification.objects.count(), 1)
+
+        # Editor juga ditolak saat PATCH tanpa token CSRF
+        client = APIClient(enforce_csrf_checks=True)
+        self.assertTrue(client.login(username="editor", password="test-password"))
+        response = client.patch(self.detail_url, {"title": "Changed"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.certification.refresh_from_db()
+        self.assertEqual(self.certification.title, "Meta Backend Developer")
+
+    def test_session_write_with_csrf_succeeds(self):
+        client = APIClient(enforce_csrf_checks=True)
+        client.login(username="owner", password="test-password")
+        page = client.get(reverse("main:show_certification"))
+        self.assertEqual(page.status_code, status.HTTP_200_OK)
+        token = client.cookies["csrftoken"].value
+        response = client.post(
+            self.list_url, self.payload, format="json", HTTP_X_CSRFTOKEN=token,
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Certification.objects.count(), 2)
