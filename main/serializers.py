@@ -2,7 +2,7 @@ from django.templatetags.static import static
 from django.utils.html import strip_tags
 from rest_framework import serializers
 
-from main.models import Certification, Project
+from main.models import Certification, Experience, Project
 
 
 class StarFieldsMixin(serializers.Serializer):
@@ -100,3 +100,47 @@ class CertificationSerializer(StarFieldsMixin, serializers.ModelSerializer):
     def validate_credential_url(self, value):
         # Model memakai null=True, jadi string kosong disimpan sebagai None
         return value or None
+
+
+class ExperienceSerializer(StarFieldsMixin, serializers.ModelSerializer):
+    category_display = serializers.CharField(source="get_category_display", read_only=True)
+    is_ongoing = serializers.BooleanField(read_only=True)
+    # Model memakai DateTimeField, tetapi form/halaman cukup mengirim tanggal (YYYY-MM-DD)
+    started_at = serializers.DateTimeField(input_formats=["iso-8601", "%Y-%m-%d"])
+    ended_at = serializers.DateTimeField(
+        input_formats=["iso-8601", "%Y-%m-%d"], required=False, allow_null=True,
+    )
+
+    class Meta:
+        model = Experience
+        fields = [
+            "id", "title", "category", "category_display", "description",
+            "thumbnail", "started_at", "ended_at", "is_ongoing",
+            "star_count", "is_starred", "starred_by_names",
+        ]
+        read_only_fields = ["id"]
+
+    def validate_title(self, value):
+        value = strip_tags(value).strip()
+        if not value:
+            raise serializers.ValidationError("Judul pengalaman tidak boleh kosong atau hanya berisi tag HTML.")
+        return value
+
+    def validate_description(self, value):
+        value = strip_tags(value).strip()
+        if not value:
+            raise serializers.ValidationError("Deskripsi tidak boleh kosong atau hanya berisi tag HTML.")
+        return value
+
+    def validate_thumbnail(self, value):
+        # Model memakai null=True, jadi string kosong disimpan sebagai None
+        return value or None
+
+    def validate(self, attrs):
+        started_at = attrs.get("started_at", getattr(self.instance, "started_at", None))
+        ended_at = attrs.get("ended_at", getattr(self.instance, "ended_at", None))
+        if started_at and ended_at and ended_at < started_at:
+            raise serializers.ValidationError(
+                {"ended_at": "Tanggal selesai tidak boleh sebelum tanggal mulai."}
+            )
+        return attrs

@@ -36,31 +36,38 @@ class MainTest(TestCase):
         self.assertEqual(self.experience.category, "part-time")
         self.assertTrue(self.experience.is_ongoing)
 
-    def test_experience_page(self):
+    def test_experience_page_is_a_skeleton(self):
         response = self.client.get(reverse("main:show_experience"))
 
+        # Tugas 6: data tidak dirender server, hanya wadah yang diisi JavaScript dari API
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "experience.html")
-        self.assertContains(response, self.experience.title)
-        self.assertContains(response, self.experience.description)
-        self.assertContains(response, "Part-Time")
-        self.assertContains(response, "Sedang berlangsung")
+        self.assertNotContains(response, self.experience.title)
+        self.assertContains(response, 'id="grid"')
+        self.assertContains(response, reverse("api:experience-list"))
         self.assertContains(response, f'href="{reverse("main:show_main")}"')
+        self.assertIn("csrftoken", response.cookies)
 
-    def test_empty_experience_page(self):
+    def test_experience_api_returns_data(self):
+        item = self.client.get(reverse("api:experience-list")).json()[0]
+
+        self.assertEqual(item["title"], self.experience.title)
+        self.assertEqual(item["description"], self.experience.description)
+        self.assertEqual(item["category_display"], "Part-Time")
+        self.assertTrue(item["is_ongoing"])
+
+    def test_empty_experience_api(self):
         Experience.objects.all().delete()
-        response = self.client.get(reverse("main:show_experience"))
 
-        self.assertContains(response, "Belum ada pengalaman yang ditambahkan.")
+        self.assertEqual(self.client.get(reverse("api:experience-list")).json(), [])
 
     def test_completed_experience(self):
         self.experience.ended_at = timezone.now()
         self.experience.save()
-        response = self.client.get(reverse("main:show_experience"))
+        item = self.client.get(reverse("api:experience-list")).json()[0]
 
         self.assertFalse(self.experience.is_ongoing)
-        self.assertContains(response, "Selesai")
-        self.assertNotContains(response, "Sedang berlangsung")
+        self.assertFalse(item["is_ongoing"])
 
 
 class ProjectTest(TestCase):
@@ -254,14 +261,14 @@ class ExperienceFeatureTest(TestCase):
         self.admin = User.objects.create_superuser("admin")
         self.client.force_login(self.admin)
 
-    def titles(self, response):
-        return [item.title for item in response.context["experience_list"]]
+    # Tugas 6: filter dan urutan sekarang berupa parameter query di API
+    def titles(self, params=None):
+        response = self.client.get(reverse("api:experience-list"), params or {})
+        return [item["title"] for item in response.json()]
 
     def test_default_sort_is_newest_first(self):
-        response = self.client.get(reverse("main:show_experience"))
-
         self.assertEqual(
-            self.titles(response),
+            self.titles(),
             ["Staff Multimedia", "Asisten Dosen", "Magang Data"],
         )
 
@@ -269,7 +276,7 @@ class ExperienceFeatureTest(TestCase):
         response = self.client.get(reverse("main:show_experience"), {"sort": "oldest"})
 
         self.assertEqual(
-            self.titles(response),
+            self.titles({"sort": "oldest"}),
             ["Magang Data", "Asisten Dosen", "Staff Multimedia"],
         )
         self.assertEqual(response.context["selected_sort"], "oldest")
@@ -279,24 +286,27 @@ class ExperienceFeatureTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["selected_sort"], "newest")
-        self.assertEqual(self.titles(response)[0], "Staff Multimedia")
+        self.assertEqual(self.titles({"sort": "asal"})[0], "Staff Multimedia")
 
     def test_filter_by_category(self):
         response = self.client.get(reverse("main:show_experience"), {"category": "part-time"})
 
-        self.assertEqual(self.titles(response), ["Asisten Dosen"])
+        self.assertEqual(self.titles({"category": "part-time"}), ["Asisten Dosen"])
         self.assertEqual(response.context["selected_category"], "part-time")
 
     def test_invalid_category_shows_all(self):
         response = self.client.get(reverse("main:show_experience"), {"category": "ngawur"})
 
-        self.assertEqual(len(self.titles(response)), 3)
+        self.assertEqual(len(self.titles({"category": "ngawur"})), 3)
         self.assertEqual(response.context["selected_category"], "")
 
-    def test_filter_without_result_shows_message(self):
-        response = self.client.get(reverse("main:show_experience"), {"category": "research"})
+    def test_filter_without_result_is_empty(self):
+        self.assertEqual(self.titles({"category": "research"}), [])
 
-        self.assertContains(response, "Tidak ada pengalaman pada kategori ini.")
+    def test_search_matches_title_or_description(self):
+        self.assertEqual(self.titles({"q": "dosen"}), ["Asisten Dosen"])
+        self.assertEqual(self.titles({"q": "membangun"}), ["Staff Multimedia"])
+        self.assertEqual(self.titles({"q": "tidakada"}), [])
 
     def test_json_endpoint(self):
         response = self.client.get(
@@ -340,11 +350,12 @@ class ExperienceFeatureTest(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_experience_card_links_to_edit(self):
-        target = Experience.objects.get(title="Magang Data")
+    def test_experience_page_has_edit_modal_for_owner(self):
+        # Tugas 6: tombol "Ubah" membuka modal yang mengirim PATCH ke API
         response = self.client.get(reverse("main:show_experience"))
 
-        self.assertContains(response, reverse("main:edit_experience", args=[target.id]))
+        self.assertContains(response, 'id="experience-modal"')
+        self.assertContains(response, 'id="experience-form"')
 
     def test_edit_experience(self):
         target = Experience.objects.get(title="Magang Data")
@@ -384,15 +395,24 @@ class ExperienceRoleTest(TestCase):
             "started_at": "2026-02-01", "ended_at": "",
         }
 
+    def assertPageRole(self, response, *, authenticated, can_edit, superuser):
+        # Tugas 6: kartu dirender JavaScript; tombol bergantung pada flag di bawah ini,
+        # sedangkan tombol tambah dan modal form hanya dirender untuk peran yang berhak.
+        flag = lambda value: "true" if value else "false"
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f'const IS_AUTHENTICATED = "{flag(authenticated)}"')
+        self.assertContains(response, f'const CAN_EDIT = "{flag(can_edit)}"')
+        self.assertContains(response, f'const IS_SUPERUSER = "{flag(superuser)}"')
+        self.assertContains(response, 'id="experience-modal"', count=1 if can_edit else 0)
+        self.assertContains(response, 'id="experience-add-button"', count=1 if superuser else 0)
+
     # Pengunjung tanpa login
     def test_anonymous_can_read_without_action_buttons(self):
-        response = self.client.get(self.list_url)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Magang Data")
-        self.assertNotContains(response, "Tambah Pengalaman")
-        self.assertNotContains(response, ">Ubah<")
-        self.assertNotContains(response, "Hapus Pengalaman")
+        self.assertPageRole(
+            self.client.get(self.list_url), authenticated=False, can_edit=False, superuser=False,
+        )
+        response = self.client.get(reverse("api:experience-list"))
+        self.assertEqual(response.json()[0]["title"], "Magang Data")
 
     def test_anonymous_redirected_to_login(self):
         for url in [self.create_url, self.edit_url, self.delete_url, self.star_url]:
@@ -413,12 +433,9 @@ class ExperienceRoleTest(TestCase):
 
     def test_regular_user_sees_only_star(self):
         self.client.force_login(self.biasa)
-        response = self.client.get(self.list_url)
-
-        self.assertContains(response, "star-form")
-        self.assertNotContains(response, "Tambah Pengalaman")
-        self.assertNotContains(response, ">Ubah<")
-        self.assertNotContains(response, "Hapus Pengalaman")
+        self.assertPageRole(
+            self.client.get(self.list_url), authenticated=True, can_edit=False, superuser=False,
+        )
 
     def test_star_toggle_one_per_user(self):
         self.client.force_login(self.biasa)
@@ -450,20 +467,16 @@ class ExperienceRoleTest(TestCase):
 
     def test_editor_sees_edit_but_not_create_or_delete(self):
         self.client.force_login(self.editor)
-        response = self.client.get(self.list_url)
-
-        self.assertContains(response, ">Ubah<")
-        self.assertNotContains(response, "Tambah Pengalaman")
-        self.assertNotContains(response, "Hapus Pengalaman")
+        self.assertPageRole(
+            self.client.get(self.list_url), authenticated=True, can_edit=True, superuser=False,
+        )
 
     # Pemilik
     def test_owner_sees_all_buttons(self):
         self.client.force_login(self.owner)
-        response = self.client.get(self.list_url)
-
-        self.assertContains(response, "Tambah Pengalaman")
-        self.assertContains(response, ">Ubah<")
-        self.assertContains(response, "Hapus Pengalaman")
+        self.assertPageRole(
+            self.client.get(self.list_url), authenticated=True, can_edit=True, superuser=True,
+        )
 
     # API
     def test_json_shows_username_not_id(self):

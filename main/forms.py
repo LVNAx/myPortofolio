@@ -29,12 +29,6 @@ class CertificationForm(ModelForm):
             "credential_url": URLInput(attrs={"placeholder": "https://coursera.org/verify/.."}),
         }
 
-    def clean_credential(self):
-        credential_url = strip_tags(self.cleaned_data["credential_url"]).strip()
-        if not credential_url:
-            raise ValidationError("Nama Credential Harus Tidak Ada Tag HTML")
-        return credential_url
-    
     def clean_title(self):
         title = strip_tags(self.cleaned_data["title"]).strip()
         if not title:

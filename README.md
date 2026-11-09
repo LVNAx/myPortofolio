@@ -236,3 +236,45 @@ Contoh: `/api/experience/?category=volunteer&sort=oldest`
 > `fetch()` itu ngga langsung ngasih data, tapi ngembaliin sebuah Promise, yaitu semacam janji bahwa hasilnya bakal datang nanti karena ngambil data dari server itu butuh waktu. Nah, `await` dipakai untuk menunggu Promise tersebut selesai, sehingga hasil yang kita pegang benar-benar objek Response asli dari server, bukan Promise yang masih pending. await ini cuma bisa dipakai di dalam `fungsi async`, dan yang berhenti nunggu itu cuma fungsinya aja, halamannya sendiri tetap responsif dan ngga nge-freeze. Hal ini juga berlaku untuk `response.json()` yang sama-sama ngembaliin Promise, jadi perlu await juga supaya isi datanya bisa dibaca. Kalo ngga pakai await, kodenya bakal lanjut ke baris berikutnya padahal datanya belum ada, misalnya `response.ok` jadi `undefined` karena response masih berupa Promise sehingga kode salah mengira request-nya gagal, dan kalo .json() ngga di-await, datanya masih berupa Promise sehingga ngga bisa dipakai untuk di-loop atau dihitung panjangnya dan muncul TypeError. Hal ini juga ngebuat error jaringan ngga bisa ketangkap try/catch, karena kegagalannya baru terjadi setelah blok try selesai. Hal ini sempat saya cek langsung di console: console.log(fetch('/api/certifications/')) cuma menampilkan Promise {<pending>}, sedangkan console.log(await fetch('/api/certifications/')) menampilkan objek Response dengan status 200.
 3. Jelaskan apa itu serangan XSS (Cross-Site Scripting) dan mengapa data yang ditampilkan melalui AJAX/JavaScript lebih rentan terhadap serangan ini daripada data yang ditampilkan langsung melalui template Django!
 > `XSS (Cross-Site Scripting)` adalah serangan di mana penyerang menyisipkan kode berbahaya, misalnya `<img src="x" onerror="alert('XSS!')">`, ke dalam data yang disimpan di website, sehingga kode itu ikut dijalankan di browser setiap pengunjung yang membuka halaman tersebut. Nah, template Django secara otomatis melakukan escaping pada {{ }}, menjadi karakter seperti < dan > diubah menjadi teks biasa dan tidak dianggap sebagai HTML. Sedangkan kalau data ditampilkan lewat AJAX, kita menyisipkannya sendiri ke halaman dengan innerHTML, dan innerHTML membaca teks itu sebagai HTML mentah tanpa escaping otomatis sama sekali. Karena itu, data dari JSON harus kita amankan sendiri, misalnya dengan `escapeHtml` atau `textContent`, dan di sisi server dibersihkan dengan  `strip_tags`, supaya kode berbahaya tampil sebagai teks biasa dan tidak dieksekusi
+
+### Tugas 6
+
+## Progress Mingguan
+| Hari / Tanggal | Progress |
+|---|---|
+| Senin, 21 September | - |
+| Selasa, 22 September | - |
+| Rabu, 23 September | Menyelesaikan Tutorial 7 |
+| Kamis, 24 September | - |
+| Jumat, 25 September | - |
+| Sabtu, 26 September | Mempelajari ulang mengenai Django REST |
+| Minggu, 27 September | Memastikan pada Certifications menyelesaikan Tugas |
+| Senin, 28 September | Menambahkan REST pada Experience |
+
+## AI Disclosure
+- **[Chat 1-Model: Claude Sonnet-5 High](https://claude.ai/share/a4fd6270-7f7d-4fc5-b1f9-f2089c6fcd7d)** digunakan untuk memahami kode
+- **[Chat 2-Model: Claude Sonnet-5 High](https://claude.ai/share/6d4a2782-9e11-4ad9-81b5-cbdced3418b7)** sama seperti yang sebelumnya, ia digunakan untuk memahami kode
+
+1. Jelaskan apa yang dimaksud dengan REST dan mengapa mengembalikan JSON saja belum cukup untuk menyebut sebuah API sebagai RESTful! Jelaskan pula perbedaan PUT dan PATCH beserta contoh kapan masing-masing sebaiknya digunakan!
+
+REST itu gaya mendesain API di mana setiap data dianggap sebagai **resource** yang punya URL sendiri, dan aksinya ditentukan oleh **method HTTP**. Misalnya /api/v1/experience/ dipakai untuk GET (baca) dan POST (buat), sedangkan /api/v1/experience/id/ dipakai untuk PUT/PATCH (ubah) dan DELETE (hapus). Nah, JSON aja belum cukup, karena di Tugas 3 dan 5 kita juga udah ngembaliin JSON, tapi URL-nya masih berupa aksi (seperti add-ajax/ atau delete/) dan semuanya lewat POST. API yang RESTful juga harus memakai **status code yang sesuai**, seperti 201, 400, 403, 404, dan 204.
+
+PUT itu **mengganti seluruh** data, jadi semua field wajib dikirim, sedangkan PATCH **mengubah sebagian** aja. Contohnya, di halaman Experience saya pakai PATCH waktu Editor cuma mau benerin judul. Sedangkan PUT cocok kalo mau menulis ulang satu experience dari awal.
+
+2. Jelaskan peran serializer pada Django REST Framework! Apa keuntungannya dibandingkan merakit dictionary secara manual dengan JsonResponse seperti pada Tutorial 05?
+
+Serializer itu semacam **penerjemah dua arah**: ia mengubah objek model menjadi JSON, dan sebaliknya membaca JSON dari user, memvalidasinya, lalu menyimpannya ke database. Jadi, perannya mirip ModelForm, tapi untuk API.
+
+Dulu di Tutorial 05 saya harus nyusun dictionary sendiri satu per satu, dan itu cuma untuk menampilkan data aja. Dengan ExperienceSerializer, satu class udah bisa dipakai untuk menampilkan, membuat, dan mengubah data. Field yang keluar juga jelas karena ditulis satu-satu, jadi data sensitif ngga ikut bocor. Selain itu, validasinya (seperti strip_tags) cukup ditulis sekali, dan kalo inputnya salah, DRF otomatis ngembaliin error 400.
+
+3. Jelaskan perbedaan autentikasi dan otorisasi pada Django REST Framework! Mengapa hak akses harus diperiksa dengan permission class di server, bukan hanya dengan menyembunyikan tombol di template?
+
+Autentikasi itu menjawab **"kamu siapa?"**, sedangkan otorisasi menjawab **"kamu boleh ngapain?"**. Di proyek ini, autentikasinya pakai SessionAuthentication (dari login biasa), lalu otorisasinya dicek oleh permission class IsPortfolioOwnerOrEditorOrReadOnly: semua orang boleh membaca, Editor boleh mengubah, dan hanya pemilik yang boleh menambah dan menghapus.
+
+Menyembunyikan tombol di template itu cuma urusan **tampilan** aja. Orang masih bisa ngirim request langsung ke API lewat console browser atau Postman tanpa pernah melihat tombolnya. Jadi, yang benar-benar menjaga data tetap aman adalah pengecekan di server.
+
+4. Jelaskan mengapa permintaan yang mengubah data tetap memerlukan token CSRF ketika API memakai SessionAuthentication! Mengapa test yang memakai force_authenticate tidak cukup untuk membuktikan bahwa perlindungan CSRF berjalan?
+
+SessionAuthentication mengenali user dari **cookie**, dan browser selalu mengirim cookie itu secara otomatis, termasuk kalo request-nya dipicu dari website lain. Tanpa token CSRF, website jahat bisa menyuruh browser pemilik yang lagi login untuk menghapus data tanpa ia sadari. Makanya, setiap fetch() di halaman Experience saya tambahkan header X-CSRFToken.
+
+force_authenticate itu langsung "menempelkan" user ke request dan **melewati pengecekan CSRF**, jadi request tanpa token pun tetap lolos. Karena itu, saya buat test terpisah dengan APIClient(enforce_csrf_checks=True) dan login() sungguhan untuk membuktikan bahwa request tanpa token memang ditolak (403).

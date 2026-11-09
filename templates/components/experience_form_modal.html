@@ -1,0 +1,38 @@
+<!-- Modal form Experience: mode tambah (POST, pemilik) dan mode edit (PATCH, pemilik/Editor) -->
+<div id="experience-modal"
+     class="project-form-modal"
+     popover="auto"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="experience-modal-title">
+    <button type="button"
+            class="project-form-modal__backdrop"
+            popovertarget="experience-modal"
+            popovertargetaction="hide"
+            aria-label="Tutup form pengalaman"></button>
+
+    <div class="project-form-modal__content">
+        <button type="button"
+                class="project-form-modal__close"
+                popovertarget="experience-modal"
+                popovertargetaction="hide"
+                aria-label="Tutup form pengalaman">×</button>
+
+        <h2 id="experience-modal-title">Tambah Pengalaman Baru</h2>
+        <form id="experience-form" class="project-form" novalidate>
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <div class="project-form-modal__actions">
+                <button type="button"
+                        class="button button-secondary"
+                        popovertarget="experience-modal"
+                        popovertargetaction="hide">Batal</button>
+                <button type="submit" class="button">Tambah Pengalaman</button>
+            </div>
+        </form>
+    </div>
+</div>

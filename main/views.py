@@ -7,6 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.core import serializers
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.templatetags.static import static
 from django.db.models import Q
@@ -41,19 +42,15 @@ def show_main(request):
     }
     return render(request, "index.html", context)
 
+@ensure_csrf_cookie  # Star/tambah/edit/hapus dikirim lewat fetch(), jadi cookie csrftoken harus selalu ada
 def show_experience(request):
+    # Halaman hanya kerangka; data diambil JavaScript dari API /api/v1/experience/.
+    # Nilai filter dari URL tetap dibaca supaya pilihan awal di dropdown sesuai.
     category, sort = get_experience_filter(request)
-
-    # Data akan diambil dari JSON, lalu bakal diubah jadi objek experience
-    json_response = get_experience_json(request)
-    experiences = [
-        item.object
-        for item in serializers.deserialize("json", json_response.content.decode("utf-8"))
-    ]
 
     context = {
         **PROFILE,
-        "experience_list": experiences,
+        "form": ExperienceForm(),
         "category_choices": Experience.EXPERIENCE_CHOICES,
         "selected_category": category,
         "selected_sort": sort,
