@@ -242,14 +242,14 @@ Contoh: `/api/experience/?category=volunteer&sort=oldest`
 ## Progress Mingguan
 | Hari / Tanggal | Progress |
 |---|---|
-| Senin, 21 September | - |
-| Selasa, 22 September | - |
-| Rabu, 23 September | Menyelesaikan Tutorial 7 |
-| Kamis, 24 September | - |
-| Jumat, 25 September | - |
-| Sabtu, 26 September | Mempelajari ulang mengenai Django REST |
-| Minggu, 27 September | Memastikan pada Certifications menyelesaikan Tugas |
-| Senin, 28 September | Menambahkan REST pada Experience |
+| Senin, 2 November | - |
+| Selasa, 3 November | - |
+| Rabu, 4 November | Menyelesaikan Tutorial 7 |
+| Kamis, 5 November | - |
+| Jumat, 6 November | - |
+| Sabtu, 7 November | Mempelajari ulang mengenai Django REST |
+| Minggu, 8 November | Memastikan pada Certifications menyelesaikan Tugas |
+| Senin, 9 November | Menambahkan REST pada Experience |
 
 ## AI Disclosure
 - **[Chat 1-Model: Claude Sonnet-5 High](https://claude.ai/share/a4fd6270-7f7d-4fc5-b1f9-f2089c6fcd7d)** digunakan untuk memahami kode
