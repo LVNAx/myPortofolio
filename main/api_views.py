@@ -1,13 +1,13 @@
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import (
     api_view, authentication_classes, permission_classes,
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from main.authentication import API_AUTHENTICATION
 from main.models import Certification, Experience, Project
 from main.permissions import (
     IsPortfolioOwnerOrEditorOrReadOnly, IsPortfolioOwnerOrReadOnly,
@@ -31,7 +31,7 @@ def toggle_star(request, obj, serializer_class):
 # Projects
 
 @api_view(["GET", "HEAD", "POST"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes(API_AUTHENTICATION)
 @permission_classes([IsPortfolioOwnerOrReadOnly])
 def project_list(request):
     if request.method in ("GET", "HEAD"):
@@ -51,7 +51,7 @@ def project_list(request):
 
 
 @api_view(["GET", "HEAD", "PUT", "PATCH", "DELETE"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes(API_AUTHENTICATION)
 @permission_classes([IsPortfolioOwnerOrReadOnly])
 def project_detail(request, project_id):
     project = get_object_or_404(
@@ -75,7 +75,7 @@ def project_detail(request, project_id):
 
 
 @api_view(["POST"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes(API_AUTHENTICATION)
 @permission_classes([IsAuthenticated])
 def project_star(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
@@ -85,7 +85,7 @@ def project_star(request, project_id):
 # Certifications (bagian pilihan tugas, Editor boleh PUT/PATCH)
 
 @api_view(["GET", "HEAD", "POST"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes(API_AUTHENTICATION)
 @permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
 def certification_list(request):
     if request.method in ("GET", "HEAD"):
@@ -107,7 +107,7 @@ def certification_list(request):
 
 
 @api_view(["GET", "HEAD", "PUT", "PATCH", "DELETE"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes(API_AUTHENTICATION)
 @permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
 def certification_detail(request, certification_id):
     certification = get_object_or_404(
@@ -131,7 +131,7 @@ def certification_detail(request, certification_id):
 
 
 @api_view(["POST"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes(API_AUTHENTICATION)
 @permission_classes([IsAuthenticated])
 def certification_star(request, certification_id):
     certification = get_object_or_404(Certification, pk=certification_id)
@@ -141,7 +141,7 @@ def certification_star(request, certification_id):
 # Experience (Editor boleh PUT/PATCH, hanya pemilik yang boleh create/delete)
 
 @api_view(["GET", "HEAD", "POST"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes(API_AUTHENTICATION)
 @permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
 def experience_list(request):
     if request.method in ("GET", "HEAD"):
@@ -168,7 +168,7 @@ def experience_list(request):
 
 
 @api_view(["GET", "HEAD", "PUT", "PATCH", "DELETE"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes(API_AUTHENTICATION)
 @permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
 def experience_detail(request, experience_id):
     experience = get_object_or_404(
@@ -192,8 +192,19 @@ def experience_detail(request, experience_id):
 
 
 @api_view(["POST"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes(API_AUTHENTICATION)
 @permission_classes([IsAuthenticated])
 def experience_star(request, experience_id):
     experience = get_object_or_404(Experience, pk=experience_id)
     return toggle_star(request, experience, ExperienceSerializer)
+
+
+# Autentikasi token
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def api_logout(request):
+    # request.auth berisi objek Token bila klien memakai token, dan None untuk sesi.
+    if request.auth is not None:
+        request.auth.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)

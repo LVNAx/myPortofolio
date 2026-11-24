@@ -171,3 +171,12 @@ MAILERS = {
 CORS_ALLOW_ALL_ORIGINS = os.getenv(
     'CORS_ALLOW_ALL_ORIGINS', str(not PRODUCTION)
 ).lower() == 'true'
+
+
+# Web memakai SessionAuthentication, klien mobile memakai TokenAuthentication.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'main.authentication.ApiSessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
