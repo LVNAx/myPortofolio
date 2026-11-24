@@ -6,3 +6,4 @@ requests
 urllib3
 python-dotenv
 djangorestframework~=3.18.3
+django-cors-headers
