@@ -45,10 +45,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',   
     'main',
+    'corsheaders',
     'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
+    # CorsMiddleware harus di atas middleware yang dapat membuat respons
+    # (CommonMiddleware, WhiteNoise) agar header CORS ikut terpasang.
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -157,4 +162,21 @@ MAILERS = {
     'default': {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
+}
+
+
+# CORS untuk klien Flutter Web (Chrome) saat pengembangan lokal.
+# Di produksi nilainya mengikuti PRODUCTION (False) kecuali environment
+# deployment mengaturnya secara eksplisit lewat CORS_ALLOW_ALL_ORIGINS.
+CORS_ALLOW_ALL_ORIGINS = os.getenv(
+    'CORS_ALLOW_ALL_ORIGINS', str(not PRODUCTION)
+).lower() == 'true'
+
+
+# Web memakai SessionAuthentication, klien mobile memakai TokenAuthentication.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'main.authentication.ApiSessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }

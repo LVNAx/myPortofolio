@@ -4,6 +4,7 @@ from datetime import date, datetime, timezone as dt_timezone
 from django.contrib.auth.models import Group, User
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
 from main.models import Certification, Experience, Project
@@ -582,3 +583,124 @@ class ExperienceAPITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.experience.refresh_from_db()
         self.assertEqual(self.experience.title, "Asisten Dosen PBP (Editor)")
+
+
+class TokenAuthAPITest(APITestCase):
+    """Login/logout berbasis token untuk klien mobile (Tutorial 10)."""
+
+    def setUp(self):
+        self.owner = User.objects.create_superuser(
+            username="owner", password="test-password", email="owner@example.com",
+        )
+        self.visitor = User.objects.create_user(username="visitor", password="test-password")
+        self.token_url = reverse("api:api_token_auth")
+        self.logout_url = reverse("api:api_logout")
+        self.list_url = reverse("api:project-list")
+        self.payload = {
+            "title": "Dari mobile", "role": "Mobile Developer", "category": "web",
+            "description": "Dikirim dengan token", "highlights": "", "tech_stack": "Flutter",
+            "live_url": "", "github_url": "", "started_at": "2026-11-01",
+        }
+
+    def login(self, username="owner"):
+        response = self.client.post(
+            self.token_url, {"username": username, "password": "test-password"}, format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        return response.data["token"]
+
+    def test_valid_credentials_return_token(self):
+        token = self.login()
+        self.assertEqual(token, Token.objects.get(user=self.owner).key)
+
+    def test_wrong_password_returns_400_without_token(self):
+        response = self.client.post(
+            self.token_url, {"username": "owner", "password": "salah"}, format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(Token.objects.exists())
+
+    def test_public_list_needs_no_token(self):
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_owner_token_can_create_project(self):
+        token = self.login()
+        response = self.client.post(
+            self.list_url, self.payload, format="json", HTTP_AUTHORIZATION=f"Token {token}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Project.objects.get().title, "Dari mobile")
+
+    def test_visitor_token_is_forbidden_to_create(self):
+        token = self.login("visitor")
+        response = self.client.post(
+            self.list_url, self.payload, format="json", HTTP_AUTHORIZATION=f"Token {token}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(Project.objects.exists())
+
+    def test_anonymous_without_header_still_gets_403(self):
+        # Perilaku web tidak berubah: tanpa header Authorization tetap 403.
+        response = self.client.post(self.list_url, self.payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_invalid_token_gets_401_with_challenge(self):
+        response = self.client.post(
+            self.list_url, self.payload, format="json", HTTP_AUTHORIZATION="Token tidak-valid",
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response["WWW-Authenticate"], "Token")
+        self.assertFalse(Project.objects.exists())
+
+    def test_logout_deletes_token_and_returns_204(self):
+        token = self.login()
+        response = self.client.post(self.logout_url, HTTP_AUTHORIZATION=f"Token {token}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Token.objects.filter(key=token).exists())
+
+    def test_token_is_rejected_after_logout(self):
+        token = self.login()
+        self.client.post(self.logout_url, HTTP_AUTHORIZATION=f"Token {token}")
+        response = self.client.post(
+            self.list_url, self.payload, format="json", HTTP_AUTHORIZATION=f"Token {token}",
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_logout_requires_authentication(self):
+        self.assertEqual(self.client.post(self.logout_url).status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_logout_with_session_keeps_tokens(self):
+        # Sesi web tidak punya token (request.auth None), jadi tidak ada yang dihapus.
+        token = Token.objects.create(user=self.owner)
+        self.client.force_login(self.owner)
+        response = self.client.post(self.logout_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertTrue(Token.objects.filter(key=token.key).exists())
+
+    def test_token_is_not_deleted_by_other_users_logout(self):
+        owner_token = self.login()
+        visitor_token = self.login("visitor")
+        self.client.post(self.logout_url, HTTP_AUTHORIZATION=f"Token {visitor_token}")
+        self.assertTrue(Token.objects.filter(key=owner_token).exists())
+
+
+class CorsAPITest(APITestCase):
+    """Flutter Web (Chrome) memanggil API dari origin yang berbeda."""
+
+    origin = "http://localhost:5555"
+
+    def test_simple_request_gets_cors_header(self):
+        response = self.client.get(reverse("api:project-list"), HTTP_ORIGIN=self.origin)
+        self.assertEqual(response["Access-Control-Allow-Origin"], "*")
+
+    def test_preflight_allows_authorization_header(self):
+        response = self.client.options(
+            reverse("api:project-list"),
+            HTTP_ORIGIN=self.origin,
+            HTTP_ACCESS_CONTROL_REQUEST_METHOD="POST",
+            HTTP_ACCESS_CONTROL_REQUEST_HEADERS="authorization,content-type",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("authorization", response["Access-Control-Allow-Headers"])
+        self.assertIn("POST", response["Access-Control-Allow-Methods"])
